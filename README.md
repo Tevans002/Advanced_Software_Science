@@ -10,7 +10,7 @@ This is our semester long project where we will be developing an app for the Mis
 
 *Madison:* Frontend, Lead
 
-*Joss:* Backend, Dev Ops
+*Jose Luis:* Backend, Dev Ops
 
 # Problem Statement: 
   * There is no centralized place to look for quick jobs or weekend gigs that are updated daily, sorted, and for the UM community. 
