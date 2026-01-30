@@ -95,8 +95,20 @@ Description:
 Expected Outcome:
 * A user can log in, search for the desired job with filters, contact the poster through the app, and confirm the job is theirs securely. 
 
+# User Stories #
 
+"As a [type of user], I want to [do something] so that [benefit]."
 
+## User Story 1 ##
+As a UM student I want to browse what dog walking jobs are available this upcoming weekend so I can make some money. 
+
+## User Story 2 ##
+Put here
+
+## User Styory 3 ##
+Put here
+
+# Tests #
 
 
 
