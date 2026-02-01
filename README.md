@@ -103,10 +103,10 @@ Expected Outcome:
 As a UM student I want to browse what dog walking jobs are available this upcoming weekend so I can make some money. 
 
 ## User Story 2 ##
-Put here
+As a member, I want to post a quick work job with a specific expiration date so that I can find help before the date ends without having to manually delete the post later.
 
 ## User Styory 3 ##
-Put here
+As a UM student with specific skills, I want to filter job listings using tags like "Manual Labours," "Tech Support," or "Pet Care," so that I don't have to scroll through irrelevant posts to find the quick gigs that match my expertise and interests.
 
 # Tests #
 
