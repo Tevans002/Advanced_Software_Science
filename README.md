@@ -12,6 +12,9 @@ This is our semester long project where we will be developing an app for the Mis
 
 *Jose Luis:* Backend, Dev Ops
 
+## RACI Matrix 
+* https://docs.google.com/spreadsheets/d/1Es76z9SzPkpE2Qm7O5KjYWJnvuj28AsJxyIiUUWnpWA/edit?gid=0#gid=0
+
 # Problem Statement: 
   * There is no centralized place to look for quick jobs or weekend gigs that are updated daily, sorted, and for the UM community. 
 
