@@ -111,33 +111,33 @@ As a UM student with specific skills, I want to filter job listings using tags l
 # Tests #
 Test Driven Development
 
-Usernames
-Test edge cases for valid usernames
+## Usernames
+* Test edge cases for valid usernames
 
-Email
-Test for valid emails, # of characters etc.
+## Email
+* Test for valid emails, # of characters etc.
 
-Bot captcha(maybe)
-Testing to ensure the users are human
+## Bot captcha(maybe)
+* Testing to ensure the users are human
 
-Date
-Ensure the date is valid (use calendar UI)
+## Date
+* Ensure the date is valid (use calendar UI)
 
-job description
-Minimum/max amount of characters for description
+## Job Description
+* Minimum/max amount of characters for description
 
-Contact information 
-via phone verification
-Email
-Social media
+## Contact information 
+* via phone verification
+* Email
+* Social media
 
-Price
-tests for negative $ and jobs over $300
+## Price
+* tests for negative $ and jobs over $300
 
-Location
-Valid within city limits
-Valid zip-code/location address
+## Location
+* Valid within city limits
+* Valid zip-code/location address
 
-Tags
+## Tags
 
 
