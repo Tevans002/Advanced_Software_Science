@@ -1,5 +1,7 @@
 # ✨Spare Change✨
 
+[![Django CI](https://github.com/Tevans002/Advanced_Software_Science/actions/workflows/django.yml/badge.svg?branch=main)](https://github.com/Tevans002/Advanced_Software_Science/actions/workflows/django.yml)
+
 This is our semester long project where we will be developing an app for the Missoula community, particularly those near the UM campus. Our app is going to target anyone looking for a small temporary job or quick way to earn some money. In terms of the job section, the goal is to have users post their job opportunity, set the expiration date and expectations, and let users quickly find a job that matches what they are looking for. 
 
 # Members and Jobs:
