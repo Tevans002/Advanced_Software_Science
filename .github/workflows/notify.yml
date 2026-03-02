@@ -1,9 +1,4 @@
-Para los tests que sí funcionan, el proceso es casi idéntico, pero cambiamos el condicional de failure() a success().
-
-Aquí tienes el archivo limpio con ambas notificaciones: una roja para los fallos y una verde para los éxitos.
-
-YAML
-name: CI Test Notification
+name: Django CI with Discord Alerts
 
 on: [push, pull_request]
 
@@ -12,40 +7,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: npm install
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12' # Ajusta según la versión que uses
 
-      - name: Run tests
-        run: npm test
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Success Notification
+      - name: Run Django Tests
+        run: python manage.py test
+
+      - name: ✅ Success Notification
         if: success()
         run: |
           curl -H "Content-Type: application/json" \
           -X POST \
           -d '{
-            "content": "✅ **¡Tests pasados con éxito!**",
+            "content": "✅ **Tests Pasados** en `${{ github.repository }}`",
             "embeds": [{
-              "title": "Verificación completada",
-              "description": "El repositorio **${{ github.repository }}** ha superado todas las pruebas.",
+              "title": "¡Todo salió bien!",
+              "description": "El código en la rama **${{ github.ref_name }}** pasó todas las pruebas de Django.",
               "color": 3066993,
               "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             }]
           }' \
           ${{ secrets.DISCORD_WEBHOOK }}
 
-      - name: Failure Notification
+      - name: ❌ Failure Notification
         if: failure()
         run: |
           curl -H "Content-Type: application/json" \
           -X POST \
           -d '{
-            "content": "❌ **¡Error en los tests!**",
+            "content": "❌ **Fallo en Tests** en `${{ github.repository }}`",
             "embeds": [{
-              "title": "Fallo detectado",
-              "description": "El repositorio **${{ github.repository }}** ha fallado en la rama **${{ github.ref_name }}**.",
+              "title": "Alerta de Error",
+              "description": "Los tests de Django han fallado. Revisa los logs para corregirlo.",
               "color": 15158332,
               "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             }]
