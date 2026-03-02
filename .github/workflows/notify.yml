@@ -1,0 +1,53 @@
+Para los tests que sí funcionan, el proceso es casi idéntico, pero cambiamos el condicional de failure() a success().
+
+Aquí tienes el archivo limpio con ambas notificaciones: una roja para los fallos y una verde para los éxitos.
+
+YAML
+name: CI Test Notification
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Success Notification
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d '{
+            "content": "✅ **¡Tests pasados con éxito!**",
+            "embeds": [{
+              "title": "Verificación completada",
+              "description": "El repositorio **${{ github.repository }}** ha superado todas las pruebas.",
+              "color": 3066993,
+              "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }]
+          }' \
+          ${{ secrets.DISCORD_WEBHOOK }}
+
+      - name: Failure Notification
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d '{
+            "content": "❌ **¡Error en los tests!**",
+            "embeds": [{
+              "title": "Fallo detectado",
+              "description": "El repositorio **${{ github.repository }}** ha fallado en la rama **${{ github.ref_name }}**.",
+              "color": 15158332,
+              "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }]
+          }' \
+          ${{ secrets.DISCORD_WEBHOOK }}
