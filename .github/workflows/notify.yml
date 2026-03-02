@@ -22,11 +22,15 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          # Apuntamos a la ruta correcta del archivo de requerimientos
+          if [ -f SpareChange/requirements.txt ]; then pip install -r SpareChange/requirements.txt; fi
+          # Instalamos django explícitamente por seguridad si no está en el txt
+          pip install django
 
       - name: Run Django Tests
         run: |
-          cd Advanced_Software_Science/SpareChange && python manage.py test
+          # Entramos a la carpeta donde está manage.py para ejecutar el test
+          cd SpareChange && python manage.py test
 
       - name: Notify Discord on Success
         if: success()
@@ -57,7 +61,7 @@ jobs:
             "content": "❌ **Build & Tests Failed**",
             "embeds": [{
               "title": "Alert in ${{ github.repository }}",
-              "description": "The workflow failed. Please check the logs to identify the issue.",
+              "description": "The workflow failed. Django tests did not pass.",
               "color": 15158332,
               "fields": [
                 { "name": "Branch", "value": "`${{ github.ref_name }}`", "inline": true },
