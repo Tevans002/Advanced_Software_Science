@@ -21,7 +21,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Run Django Tests
-        run: python manage.py test
+        run: python SpareChange/manage.py test
 
       - name: ✅ Success Notification
         if: success()
