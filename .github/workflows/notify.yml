@@ -1,19 +1,23 @@
-name: Django CI with Discord Alerts
+name: Django CI with Discord Notifications
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.12' # Ajusta según la versión que uses
+          python-version: '3.12'
 
       - name: Install Dependencies
         run: |
@@ -21,35 +25,44 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Run Django Tests
-        run: python SpareChange/manage.py test
+        run: |
+          cd Advanced_Software_Science/SpareChange && python manage.py test
 
-      - name: ✅ Success Notification
+      - name: Notify Discord on Success
         if: success()
         run: |
           curl -H "Content-Type: application/json" \
           -X POST \
           -d '{
-            "content": "✅ **Tests Pasados** en `${{ github.repository }}`",
+            "content": "✅ **Build & Tests Passed**",
             "embeds": [{
-              "title": "¡Todo salió bien!",
-              "description": "El código en la rama **${{ github.ref_name }}** pasó todas las pruebas de Django.",
+              "title": "Repository: ${{ github.repository }}",
+              "description": "All tests passed successfully in the **${{ github.ref_name }}** branch.",
               "color": 3066993,
+              "fields": [
+                { "name": "Commit", "value": "`${{ github.sha }}`", "inline": true },
+                { "name": "Author", "value": "${{ github.actor }}", "inline": true }
+              ],
               "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             }]
           }' \
           ${{ secrets.DISCORD_WEBHOOK }}
 
-      - name: ❌ Failure Notification
+      - name: Notify Discord on Failure
         if: failure()
         run: |
           curl -H "Content-Type: application/json" \
           -X POST \
           -d '{
-            "content": "❌ **Fallo en Tests** en `${{ github.repository }}`",
+            "content": "❌ **Build & Tests Failed**",
             "embeds": [{
-              "title": "Alerta de Error",
-              "description": "Los tests de Django han fallado. Revisa los logs para corregirlo.",
+              "title": "Alert in ${{ github.repository }}",
+              "description": "The workflow failed. Please check the logs to identify the issue.",
               "color": 15158332,
+              "fields": [
+                { "name": "Branch", "value": "`${{ github.ref_name }}`", "inline": true },
+                { "name": "Triggered by", "value": "${{ github.actor }}", "inline": true }
+              ],
               "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             }]
           }' \
