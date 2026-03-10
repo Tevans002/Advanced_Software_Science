@@ -1,0 +1,73 @@
+name: Django CI with Discord Notifications
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Apuntamos a la ruta correcta del archivo de requerimientos
+          if [ -f SpareChange/requirements.txt ]; then pip install -r SpareChange/requirements.txt; fi
+          # Instalamos django explícitamente por seguridad si no está en el txt
+          pip install django
+
+      - name: Run Django Tests
+        run: |
+          # Entramos a la carpeta donde está manage.py para ejecutar el test
+          cd SpareChange && python manage.py test
+
+      - name: Notify Discord on Success
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d '{
+            "content": "✅ **Build & Tests Passed**",
+            "embeds": [{
+              "title": "Repository: ${{ github.repository }}",
+              "description": "All tests passed successfully in the **${{ github.ref_name }}** branch.",
+              "color": 3066993,
+              "fields": [
+                { "name": "Commit", "value": "`${{ github.sha }}`", "inline": true },
+                { "name": "Author", "value": "${{ github.actor }}", "inline": true }
+              ],
+              "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }]
+          }' \
+          ${{ secrets.DISCORD_WEBHOOK }}
+
+      - name: Notify Discord on Failure
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d '{
+            "content": "❌ **Build & Tests Failed**",
+            "embeds": [{
+              "title": "Alert in ${{ github.repository }}",
+              "description": "The workflow failed. Django tests did not pass.",
+              "color": 15158332,
+              "fields": [
+                { "name": "Branch", "value": "`${{ github.ref_name }}`", "inline": true },
+                { "name": "Triggered by", "value": "${{ github.actor }}", "inline": true }
+              ],
+              "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }]
+          }' \
+          ${{ secrets.DISCORD_WEBHOOK }}
