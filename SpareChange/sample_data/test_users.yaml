@@ -1,0 +1,114 @@
+# Sample base_user fixture
+# Load with: python manage.py loaddata sample_data/test_users.yaml
+# Password for all users = "password1234"
+# If you want a different password:
+#   python manage.py shell
+#   >>> from django.contrib.auth.hashers import make_password
+#   >>> make_password("yourpasswordhere")
+#   and paste the output into the password field.
+# pk starts at 51 to prevent conflicts if teammates have their own users created.
+
+# --- SUPERUSER ---
+- model: users.base_user
+  pk: 51
+  fields:
+    username: "superuser"
+    password: 'pbkdf2_sha256$1200000$4WT5nZQ63himcVDxxxuTKl$Tuuc5GFv4WMes4j2X0G03/duME1Xbjxk+pKs94c1QSA='
+    email: "superuser@sparechange.com"
+    first_name: "Super"
+    last_name: "User"
+    user_bio: "Superuser account."
+    zipcode: "59801"
+    profile_pic: null
+    date_of_birth: null
+    is_verified: true
+    is_staff: true
+    is_superuser: true
+    is_active: true
+
+# --- ADMIN USERS ---
+- model: users.base_user
+  pk: 52
+  fields:
+    username: "admin1"
+    password: 'pbkdf2_sha256$1200000$4WT5nZQ63himcVDxxxuTKl$Tuuc5GFv4WMes4j2X0G03/duME1Xbjxk+pKs94c1QSA='
+    email: "admin1@sparechange.com"
+    first_name: "Admin"
+    last_name: "One"
+    user_bio: "Admin account one."
+    zipcode: "59801"
+    profile_pic: null
+    date_of_birth: null
+    is_verified: true
+    is_staff: true
+    is_superuser: false
+    is_active: true
+
+- model: users.base_user
+  pk: 53
+  fields:
+    username: "admin2"
+    password: 'pbkdf2_sha256$1200000$4WT5nZQ63himcVDxxxuTKl$Tuuc5GFv4WMes4j2X0G03/duME1Xbjxk+pKs94c1QSA='
+    email: "admin2@sparechange.com"
+    first_name: "Admin"
+    last_name: "Two"
+    user_bio: "Admin account two."
+    zipcode: "59801"
+    profile_pic: null
+    date_of_birth: null
+    is_verified: true
+    is_staff: true
+    is_superuser: false
+    is_active: true
+
+# --- REGULAR USERS ---
+- model: users.base_user
+  pk: 54
+  fields:
+    username: "user1"
+    password: 'pbkdf2_sha256$1200000$4WT5nZQ63himcVDxxxuTKl$Tuuc5GFv4WMes4j2X0G03/duME1Xbjxk+pKs94c1QSA='
+    email: "user1@example.com"
+    first_name: "John"
+    last_name: "Smith"
+    user_bio: "Regular user one."
+    zipcode: "59801"
+    profile_pic: null
+    date_of_birth: null
+    is_verified: true
+    is_staff: false
+    is_superuser: false
+    is_active: true
+
+- model: users.base_user
+  pk: 55
+  fields:
+    username: "user2"
+    password: 'pbkdf2_sha256$1200000$4WT5nZQ63himcVDxxxuTKl$Tuuc5GFv4WMes4j2X0G03/duME1Xbjxk+pKs94c1QSA='
+    email: "user2@example.com"
+    first_name: "Jane"
+    last_name: "Doe"
+    user_bio: "Regular user two."
+    zipcode: "59801"
+    profile_pic: null
+    date_of_birth: null
+    is_verified: true
+    is_staff: false
+    is_superuser: false
+    is_active: true
+
+- model: users.base_user
+  pk: 56
+  fields:
+    username: "user3"
+    password: 'pbkdf2_sha256$1200000$4WT5nZQ63himcVDxxxuTKl$Tuuc5GFv4WMes4j2X0G03/duME1Xbjxk+pKs94c1QSA='
+    email: "user3@example.com"
+    first_name: "Bob"
+    last_name: "Johnson"
+    user_bio: "Regular user three."
+    zipcode: "59801"
+    profile_pic: null
+    date_of_birth: null
+    is_verified: true
+    is_staff: false
+    is_superuser: false
+    is_active: true
