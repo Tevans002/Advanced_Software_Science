@@ -3,7 +3,7 @@
   <h2>Create an Account</h2>
   <p class="form-note">Use a username (not email) and a strong password.</p>
 
-  <form method="post">
+  <form method="post" id="signup-form">
     {% csrf_token %} {% if form.non_field_errors %}
     <div class="form-errors">{{ form.non_field_errors }}</div>
     {% endif %} {% for field in form %}
@@ -16,9 +16,60 @@
     </div>
     {% endfor %}
 
-    <button type="submit" class="btn">Register</button>
+    <button type="button" class="btn" onclick="showTnC()">Register</button>
   </form>
 
   <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
 </div>
+
+<!-- Terms & Conditions Modal -->
+<div id="tnc-modal" class="modal-overlay" style="display: none">
+  <div class="modal-box">
+    <h3>Terms &amp; Conditions</h3>
+    <div class="tnc-body">
+      <p>
+        <strong>1. Acceptance of Terms</strong><br />
+        By creating an account on SpareChange, you agree to be bound by these
+        Terms and Conditions.
+      </p>
+      <p>
+        <strong>2. Age Requirement</strong><br />
+        You must be at least 13 years old to create an account on SpareChange.
+      </p>
+      <p>
+        <strong>3. Account Responsibility</strong><br />
+        You are responsible for keeping your login credentials secure and not
+        sharing personal information.
+      </p>
+      <p>
+        <strong>4. Privacy</strong><br />
+        Your data is stored securely and will not be shared with third parties
+        without your consent.
+      </p>
+      <p>
+        <strong>5. Changes to Terms</strong><br />
+        SpareChange reserves the right to update these terms at any time.
+        Continued use of the service constitutes acceptance of any changes.
+      </p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-decline" onclick="closeTnC()">Decline</button>
+      <button class="btn btn-accept" onclick="acceptTnC()">
+        Accept &amp; Register
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showTnC() {
+    document.getElementById("tnc-modal").style.display = "flex";
+  }
+  function closeTnC() {
+    document.getElementById("tnc-modal").style.display = "none";
+  }
+  function acceptTnC() {
+    document.getElementById("signup-form").submit();
+  }
+</script>
 {% endblock %}
