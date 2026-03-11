@@ -5,25 +5,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SpareChange</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'styles/base.css' %}" />
   </head>
 
   <body>
     <nav>
-      <a href="{% url 'home' %}">SpareChange</a>
-      <div>
+      <a href="{% url 'home' %}" class="brand">SpareChange</a>
+      <div class="links">
         {% if user.is_authenticated %}
-        <form action="{% url 'logout' %}" method="post" style="display: inline">
+        <span class="user-greeting">Hello, {{ user.username }}</span>
+        <form action="{% url 'logout' %}" method="post" class="logout-form">
           {% csrf_token %}
-          <button type="submit">Logout</button>
+          <button type="submit" class="logout-btn">Logout</button>
         </form>
         {% else %}
-        <a href="{% url 'signup' %}">Sign Up</a>
         <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'signup' %}">Sign Up</a>
         {% endif %}
       </div>
     </nav>
-
     <div class="container">{% block content %} {% endblock content %}</div>
   </body>
 </html>
