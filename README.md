@@ -37,6 +37,17 @@ This is our semester long project where we will be developing an app for the Mis
  * user profile (bio, location, contact info, job preferences)
  * posts automaticaly delete if they go past the expiration date 
 
+# Setup
+ * Create a folder on your computer
+ * Go into that folder in terminal and run 'git clone https://github.com/Tevans002/Advanced_Software_Science.git'
+ * Once that finishes open up the folder created and go into the SpareChange folder
+ * run 'python manage.py migrate'
+ * Once that's done run 'python manage.py runserver'
+ * Open up the link that says 'Starting development server at http://...'
+
+# Usage
+ * To use our webapp users need to login or create an account. Once they create an account they will be prompted to accpet the Terms and Conditions, if they do they will eb directed to the login screen where they can login wth their new credentials. That takes them to the home page. 
+
 # Use Cases
 
 ## Use Case 1: Creating an account ##
