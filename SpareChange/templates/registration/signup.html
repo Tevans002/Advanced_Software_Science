@@ -1,11 +1,24 @@
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <div class="auth-container">
-    <h2>Create an Account</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn">Register</button>
-    </form>
-    <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+  <h2>Create an Account</h2>
+  <p class="form-note">Use a username (not email) and a strong password.</p>
+
+  <form method="post">
+    {% csrf_token %} {% if form.non_field_errors %}
+    <div class="form-errors">{{ form.non_field_errors }}</div>
+    {% endif %} {% for field in form %}
+    <div class="field-wrap">
+      {{ field.label_tag }} {{ field }} {% if field.help_text %}
+      <small class="field-help">{{ field.help_text|safe }}</small>
+      {% endif %} {% if field.errors %}
+      <div class="field-errors">{{ field.errors }}</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="btn">Register</button>
+  </form>
+
+  <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
 </div>
 {% endblock %}
