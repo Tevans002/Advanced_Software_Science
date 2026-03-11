@@ -26,7 +26,12 @@ SECRET_KEY = "django-insecure-lot@r+n!_22rz&q%7)b-q96_34t+77^=qi+5zr00i(7oaai*fp
 DEBUG = True
 
 ALLOWED_HOSTS = []
+# Custom user model
+AUTH_USER_MODEL = "users.base_user"
 
+# Media files (profile pics, etc.)
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Application definition
 
@@ -37,7 +42,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'users'
+    "users",
+    "jobs",
 ]
 
 MIDDLEWARE = [
@@ -52,20 +58,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "SpareChange.urls"
 
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
 
 WSGI_APPLICATION = "SpareChange.wsgi.application"
 
@@ -116,6 +108,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "login"
