@@ -3,6 +3,9 @@
   <h1>Spare Change</h1>
   <p class="subtitle">Earn Money Quick.</p>
   {% if not user.is_authenticated %}
+  <p style="color: white; font-size: 18px; margin-top: 30px">
+    You are not logged in.
+  </p>
   <div class="auth-links">
     <a href="{% url 'login' %}">Login</a>
     <a href="{% url 'signup' %}">Sign Up</a>

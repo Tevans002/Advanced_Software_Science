@@ -13,7 +13,9 @@
       <a href="{% url 'home' %}" class="brand">Spare Change</a>
       <div class="links">
         {% if user.is_authenticated %}
-        <span class="user-greeting">Hello, {{ user.username }}</span>
+        <span class="user-greeting"
+          >Hello, <strong>{{ user.username }}</strong>!</span
+        >
         <form action="{% url 'logout' %}" method="post" class="logout-form">
           {% csrf_token %}
           <button type="submit" class="logout-btn">Logout</button>
