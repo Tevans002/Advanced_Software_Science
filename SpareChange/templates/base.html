@@ -12,6 +12,7 @@
 <body>
     <nav>
         <a href="{% url 'home' %}">SpareChange</a>
+        <a href="{% url 'create_job' %}">Post A Job</a>
         <div>
             {% if user.is_authenticated %}
                 <form action="{% url 'logout' %}" method="post" style="display:inline;">
