@@ -5,7 +5,7 @@ if yours is broken/not working:
    pip install pyyaml
    (or pip install -r requirements.txt)s
 
-2) In users/migrations/, delete everything except __init__.py
+2) In users/migrations/, delete everything except __init__.py  (eventually will have a .yaml for jobs too)
 
 3) Delete db.sqlite3 from the project root
 
@@ -13,8 +13,8 @@ if yours is broken/not working:
    python manage.py makemigrations
    python manage.py migrate
 
-These changes were needed because we added a custom user model (base_user) 
-w/ new fields (profile_pic, zipcode, date_of_birth, is_verified).
 
 finally
 5) python manage.py loaddata sample_data/test_users.yaml
+after you've loaded the test users
+6) python manage.py loaddate sample_data/test_jobs.yaml

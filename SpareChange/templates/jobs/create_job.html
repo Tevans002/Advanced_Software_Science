@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="auth-container">
 <h2>Post a Job</h2>
 <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Post Job</button>
 </form>
+</div>
 {% endblock %}

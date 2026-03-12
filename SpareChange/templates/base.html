@@ -16,6 +16,7 @@
         <span class="user-greeting"
           >Hello, <strong>{{ user.username }}</strong>!</span
         >
+        <a href="{% url 'create_job' %}" class="logout-btn">Post a Job</a>
         <form action="{% url 'logout' %}" method="post" class="logout-form">
           {% csrf_token %}
           <button type="submit" class="logout-btn">Logout</button>

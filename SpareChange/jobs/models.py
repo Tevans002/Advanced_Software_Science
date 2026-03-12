@@ -1,5 +1,3 @@
-from tkinter import CASCADE
-
 from django.db import models
 from users.models import base_user
 
