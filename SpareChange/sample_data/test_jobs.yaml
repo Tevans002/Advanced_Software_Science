@@ -1,0 +1,160 @@
+# Sample JobPost fixture
+# Load with: python manage.py loaddata sample_data/test_jobs.yaml
+# Load users first: python manage.py loaddata sample_data/test_users.yaml
+# pk starts at 101 to prevent conflicts with teammate data.
+
+# --- JOHN SMITH (pk: 54) ---
+- model: jobs.jobpost
+  pk: 101
+  fields:
+    poster: 54
+    title: "Lawn Mowing"
+    description: "Need someone to mow my front and back yard. Equipment provided."
+    location: "Missoula, MT 59801"
+    pay: "25.00"
+    price_type: "FL"
+    estimated_hours: 1
+    start_date: "2026-03-20"
+    end_date: null
+    is_recurring: false
+    hide_from_listings: false
+    created_at: "2026-03-01T10:00:00"
+    updated_at: "2026-03-01T10:00:00"
+
+- model: jobs.jobpost
+  pk: 102
+  fields:
+    poster: 54
+    title: "Dog Walking"
+    description: "Looking for someone to walk my golden retriever every weekday morning. About 30 minutes per walk."
+    location: "Missoula, MT 59801"
+    pay: "15.00"
+    price_type: "HR"
+    estimated_hours: null
+    start_date: "2026-03-24"
+    end_date: "2026-06-01"
+    is_recurring: true
+    hide_from_listings: false
+    created_at: "2026-03-01T10:00:00"
+    updated_at: "2026-03-01T10:00:00"
+
+- model: jobs.jobpost
+  pk: 103
+  fields:
+    poster: 54
+    title: "Help Moving Furniture"
+    description: "Need a couple of strong people to help move furniture to a new apartment. Lunch provided."
+    location: "Missoula, MT 59801"
+    pay: "50.00"
+    price_type: "FL"
+    estimated_hours: 3
+    start_date: "2026-03-28"
+    end_date: null
+    is_recurring: false
+    hide_from_listings: false
+    created_at: "2026-03-01T10:00:00"
+    updated_at: "2026-03-01T10:00:00"
+
+# --- JANE DOE (pk: 55) ---
+- model: jobs.jobpost
+  pk: 104
+  fields:
+    poster: 55
+    title: "House Cleaning"
+    description: "Looking for someone to do a deep clean of a 2 bedroom apartment. Supplies provided."
+    location: "Missoula, MT 59803"
+    pay: "80.00"
+    price_type: "FL"
+    estimated_hours: 4
+    start_date: "2026-03-22"
+    end_date: null
+    is_recurring: false
+    hide_from_listings: false
+    created_at: "2026-03-01T10:00:00"
+    updated_at: "2026-03-01T10:00:00"
+
+- model: jobs.jobpost
+  pk: 105
+  fields:
+    poster: 55
+    title: "Grocery Pickup"
+    description: "Need someone to pick up groceries from Albertsons and drop them off. Will reimburse for groceries plus pay for time."
+    location: "Missoula, MT 59803"
+    pay: null
+    price_type: "NG"
+    estimated_hours: 1
+    start_date: "2026-03-15"
+    end_date: null
+    is_recurring: false
+    hide_from_listings: false
+    created_at: "2026-03-01T10:00:00"
+    updated_at: "2026-03-01T10:00:00"
+
+- model: jobs.jobpost
+  pk: 106
+  fields:
+    poster: 55
+    title: "Babysitting"
+    description: "Need a reliable babysitter for two kids (ages 5 and 8) on weekend evenings. Experience preferred."
+    location: "Missoula, MT 59803"
+    pay: "18.00"
+    price_type: "HR"
+    estimated_hours: 4
+    start_date: "2026-03-21"
+    end_date: "2026-05-31"
+    is_recurring: true
+    hide_from_listings: false
+    created_at: "2026-03-01T10:00:00"
+    updated_at: "2026-03-01T10:00:00"
+
+# --- BOB JOHNSON (pk: 56) ---
+- model: jobs.jobpost
+  pk: 107
+  fields:
+    poster: 56
+    title: "Snow Shoveling"
+    description: "Need driveway and walkway shoveled after snowfall. Shovel provided."
+    location: "Missoula, MT 59802"
+    pay: "20.00"
+    price_type: "FL"
+    estimated_hours: 1
+    start_date: "2026-03-13"
+    end_date: null
+    is_recurring: false
+    hide_from_listings: false
+    created_at: "2026-03-01T10:00:00"
+    updated_at: "2026-03-01T10:00:00"
+
+- model: jobs.jobpost
+  pk: 108
+  fields:
+    poster: 56
+    title: "Handyman Help"
+    description: "Need some minor home repairs done — fixing a leaky faucet, patching drywall, and replacing light fixtures."
+    location: "Missoula, MT 59802"
+    pay: "25.00"
+    price_type: "HR"
+    estimated_hours: 3
+    start_date: "2026-03-25"
+    end_date: null
+    is_recurring: false
+    hide_from_listings: false
+    created_at: "2026-03-01T10:00:00"
+    updated_at: "2026-03-01T10:00:00"
+
+- model: jobs.jobpost
+  pk: 109
+  fields:
+    poster: 56
+    title: "Tutoring - High School Math"
+    description: "Looking for a patient tutor for my high schooler who needs help with algebra and geometry. Twice a week."
+    location: "Missoula, MT 59802"
+    pay: null
+    price_type: "NG"
+    estimated_hours: 2
+    start_date: "2026-03-17"
+    end_date: "2026-05-15"
+    is_recurring: true
+    hide_from_listings: false
+    created_at: "2026-03-01T10:00:00"
+    updated_at: "2026-03-01T10:00:00"
