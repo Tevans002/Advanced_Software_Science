@@ -1,36 +1,31 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SpareChange</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
+    <link rel="stylesheet" href="{% static 'styles/base.css' %}" />
+  </head>
 
-<body>
+  <body>
     <nav>
-        <a href="{% url 'home' %}">SpareChange</a>
-        <a href="{% url 'create_job' %}">Post A Job</a>
-        <div>
-            {% if user.is_authenticated %}
-                <form action="{% url 'logout' %}" method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit">Logout</button>
-                </form>
-            {% else %}
-                <a href="{% url 'signup' %}">Sign Up</a>
-                <a href="{% url 'login' %}">Login</a>
-            {% endif %}
-        </div>
+      <a href="{% url 'home' %}" class="brand">Spare Change</a>
+      <div class="links">
+        {% if user.is_authenticated %}
+        <span class="user-greeting"
+          >Hello, <strong>{{ user.username }}</strong>!</span
+        >
+        <form action="{% url 'logout' %}" method="post" class="logout-form">
+          {% csrf_token %}
+          <button type="submit" class="logout-btn">Logout</button>
+        </form>
+        {% else %}
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'signup' %}">Sign Up</a>
+        {% endif %}
+      </div>
     </nav>
-
-    <div class="container">
-        {% block content %}
-        {% endblock content %}
-    </div>
-
-</body>
-
+    <div class="container">{% block content %} {% endblock content %}</div>
+  </body>
 </html>
