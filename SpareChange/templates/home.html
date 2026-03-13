@@ -1,7 +1,5 @@
 {% extends "base.html" %} {% block content %}
-<div class="hero">
-  <h1>Spare Change</h1>
-  <p class="subtitle">Earn Money Quick.</p>
+<div class="hero {% if jobs %}hero-compact{% endif %}">
   {% if not user.is_authenticated %}
   <p style="color: white; font-size: 18px; margin-top: 30px">
     You are not logged in.
@@ -16,4 +14,36 @@
   </p>
   {% endif %}
 </div>
+
+<section class="job-section" aria-label="Job listings">
+  <div class="job-section-header">
+    <h2>Available Jobs</h2>
+    <p>Browse recent jobs posted by people in your area.</p>
+  </div>
+
+  {% if jobs %}
+  <div class="job-grid">
+    {% for job in jobs %}
+    <article class="job-card">
+      <div class="job-card-top">
+        <h3>{{ job.title }}</h3>
+        <span class="job-price-type">{{ job.get_price_type_display }}</span>
+      </div>
+      <p class="job-desc">{{ job.description|truncatechars:150 }}</p>
+      <div class="job-meta">
+        <span>{{ job.location }}</span>
+        {% if job.pay %}
+        <span>${{ job.pay }}</span>
+        {% else %}
+        <span>Pay negotiable</span>
+        {% endif %}
+      </div>
+      <p class="job-poster">Posted by {{ job.poster.username }}</p>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="job-empty">No jobs posted yet. Be the first to post one.</p>
+  {% endif %}
+</section>
 {% endblock %}
