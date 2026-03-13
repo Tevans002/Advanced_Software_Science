@@ -41,7 +41,10 @@ This is our semester long project where we will be developing an app for the Mis
  * Create a folder on your computer
  * Go into that folder in terminal and run 'git clone https://github.com/Tevans002/Advanced_Software_Science.git'
  * Once that finishes open up the folder created and go into the SpareChange folder
+ * run "pip install -r requirements.txt"
  * run 'python manage.py migrate'
+ * To get the test users run "python manage.py loaddata sample_data/test_users.yaml"
+ * To get test jobs run "python manage.py loaddata sample_data/test_jobs.yaml"
  * Once that's done run 'python manage.py runserver'
  * Open up the link that says 'Starting development server at http://...'
 
