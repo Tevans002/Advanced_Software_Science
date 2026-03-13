@@ -24,3 +24,7 @@ class JobPost(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     hide_from_listings = models.BooleanField(default=False)
+
+    def __str__(self):
+        """Return the job title as the string representation"""
+        return self.title
