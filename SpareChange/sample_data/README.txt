@@ -17,4 +17,4 @@ if yours is broken/not working:
 finally
 5) python manage.py loaddata sample_data/test_users.yaml
 after you've loaded the test users
-6) python manage.py loaddate sample_data/test_jobs.yaml
+6) python manage.py loaddata sample_data/test_jobs.yaml
