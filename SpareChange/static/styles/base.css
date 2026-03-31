@@ -428,3 +428,198 @@ nav a:hover {
     gap: 6px;
   }
 }
+
+/* Job Details Modal Styles */
+#jobModal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+#jobModal.active {
+  display: flex;
+}
+
+.job-modal-overlay {
+  /* Styles handled by #jobModal ID selector */
+}
+
+.modal-popup {
+  background: rgba(168, 230, 201, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 2rem;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  color: #143625;
+}
+
+.modal-cancel {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #143625;
+  padding: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.modal-cancel:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.modal-title {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #0e2a1c;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.modal-date {
+  text-align: center;
+  color: #244a37;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.modal-description {
+  width: 90%;
+  margin: 0 auto 1.5rem;
+  color: #143625;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.modal-contact-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+}
+
+.contact-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(46, 204, 113, 0.5);
+  flex-shrink: 0;
+  border: 2px solid rgba(46, 204, 113, 0.8);
+}
+
+.contact-info {
+  flex: 1;
+}
+
+.modal-contact {
+  margin-bottom: 0.5rem;
+  color: #0e2a1c;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.modal-price {
+  color: #143625;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0e2a1c;
+}
+
+.modal-confirm {
+  display: block;
+  margin-left: auto;
+  padding: 0.75rem 2rem;
+  background: rgba(46, 204, 113, 0.6);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.modal-confirm:hover {
+  background: rgba(46, 204, 113, 0.8);
+}
+
+/* Confirmation Modal */
+#confirmationModal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+}
+
+#confirmationModal.active {
+  display: flex;
+}
+
+.confirmation-modal {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  min-width: 280px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.confirmation-text {
+  font-size: 1.2rem;
+  color: #0e2a1c;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+.confirmation-btn {
+  padding: 0.75rem 2rem;
+  background: rgba(46, 204, 113, 0.6);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.confirmation-btn:hover {
+  background: rgba(46, 204, 113, 0.8);
+}

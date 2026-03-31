@@ -24,7 +24,7 @@
   {% if jobs %}
   <div class="job-grid">
     {% for job in jobs %}
-    <article class="job-card">
+    <article class="job-card" data-job-id="{{ job.id }}" data-job-title="{{ job.title }}" data-job-date="{{ job.created_at|date:'M d, Y' }}" data-job-description="{{ job.description }}" data-job-location="{{ job.location }}" data-job-pay="{{ job.pay }}" data-job-poster="{{ job.poster.username }}" onclick="openJobModal(this)">
       <div class="job-card-top">
         <h3>{{ job.title }}</h3>
         <span class="job-price-type">{{ job.get_price_type_display }}</span>
@@ -46,4 +46,64 @@
   <p class="job-empty">No jobs posted yet. Be the first to post one.</p>
   {% endif %}
 </section>
+
+<!-- Job Details Modal -->
+<div id="jobModal" class="job-modal-overlay" onclick="closeJobModal(event)">
+  <div class="modal-popup" onclick="event.stopPropagation()">
+    <button class="modal-cancel" onclick="closeJobModal()">✕</button>
+    <h2 class="modal-title" id="modalJobTitle"></h2>
+    <p class="modal-date" id="modalJobDate"></p>
+    <p class="modal-description" id="modalJobDescription"></p>
+    
+    <div class="modal-contact-section">
+      <div class="contact-avatar"></div>
+      <div class="contact-info">
+        <p class="modal-contact">How to contact: <strong id="modalJobPoster"></strong></p>
+        <p class="modal-price">Price: $<span id="modalJobPrice"></span></p>
+      </div>
+    </div>
+    
+    <button class="modal-confirm" onclick="showConfirmationModal()">Confirm</button>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="confirmation-modal-overlay" onclick="closeConfirmationModal(event)">
+  <div class="confirmation-modal">
+    <p class="confirmation-text">Your job was confirmed</p>
+    <button class="confirmation-btn" onclick="returnToHome()">Okay</button>
+  </div>
+</div>
+
+<script>
+function openJobModal(card) {
+  const modal = document.getElementById('jobModal');
+  document.getElementById('modalJobTitle').textContent = card.dataset.jobTitle;
+  document.getElementById('modalJobDate').textContent = card.dataset.jobDate;
+  document.getElementById('modalJobDescription').textContent = card.dataset.jobDescription;
+  document.getElementById('modalJobPoster').textContent = card.dataset.jobPoster;
+  document.getElementById('modalJobPrice').textContent = card.dataset.jobPay;
+  modal.classList.add('active');
+}
+
+function closeJobModal(event) {
+  if (event && event.target.id !== 'jobModal') return;
+  document.getElementById('jobModal').classList.remove('active');
+}
+
+function showConfirmationModal() {
+  closeJobModal();
+  document.getElementById('confirmationModal').classList.add('active');
+}
+
+function closeConfirmationModal(event) {
+  if (event && event.target.id !== 'confirmationModal') return;
+  document.getElementById('confirmationModal').classList.remove('active');
+}
+
+function returnToHome() {
+  closeConfirmationModal();
+  window.location.href = '{% url "home" %}';
+}
+</script>
 {% endblock %}
