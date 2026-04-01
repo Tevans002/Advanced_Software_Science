@@ -6,7 +6,7 @@
 
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(#29d03fc1 0%, #10291d 100%);
+  background: linear-gradient(#187a25c1 0%, #10291d 100%);
   min-height: 100vh;
 }
 
@@ -453,7 +453,7 @@ nav a:hover {
 }
 
 .modal-popup {
-  background: rgba(168, 230, 201, 0.5);
+  background: rgba(17, 75, 48, 0.5);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.6);
@@ -465,7 +465,7 @@ nav a:hover {
   padding: 2rem;
   position: relative;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  color: #143625;
+  color: #e5ece9;
 }
 
 .modal-cancel {
@@ -476,7 +476,7 @@ nav a:hover {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #143625;
+  color: #e5ece9;
   padding: 0.5rem;
   width: 2rem;
   height: 2rem;
@@ -494,7 +494,7 @@ nav a:hover {
 .modal-title {
   text-align: center;
   font-size: 1.8rem;
-  color: #0e2a1c;
+  color: #e5ece9;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
   font-weight: 600;
@@ -502,7 +502,7 @@ nav a:hover {
 
 .modal-date {
   text-align: center;
-  color: #244a37;
+  color: #e5ece9;
   font-size: 0.95rem;
   margin-bottom: 1.5rem;
 }
@@ -510,7 +510,7 @@ nav a:hover {
 .modal-description {
   width: 90%;
   margin: 0 auto 1.5rem;
-  color: #143625;
+  color: #e5ece9;
   line-height: 1.6;
   font-size: 0.95rem;
 }
@@ -525,6 +525,7 @@ nav a:hover {
   border-radius: 8px;
 }
 
+/* will be an image that user picks later */
 .contact-avatar {
   width: 60px;
   height: 60px;
@@ -540,23 +541,22 @@ nav a:hover {
 
 .modal-contact {
   margin-bottom: 0.5rem;
-  color: #0e2a1c;
+  color: #e5ece9;
   font-size: 0.95rem;
   font-weight: 500;
 }
 
 .modal-price {
-  color: #143625;
+  color: #e5ece9;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #0e2a1c;
 }
 
 .modal-confirm {
   display: block;
   margin-left: auto;
   padding: 0.75rem 2rem;
-  background: rgba(46, 204, 113, 0.6);
+  background: rgba(24, 105, 67, 0.5);
   color: white;
   border: none;
   border-radius: 6px;
@@ -590,9 +590,10 @@ nav a:hover {
 }
 
 .confirmation-modal {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(17, 75, 48, 0.5);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  color: #e5ece9;
   border-radius: 12px;
   padding: 2rem;
   text-align: center;
@@ -603,7 +604,7 @@ nav a:hover {
 
 .confirmation-text {
   font-size: 1.2rem;
-  color: #0e2a1c;
+  color: #e5ece9;
   margin-bottom: 2rem;
   font-weight: 500;
 }
