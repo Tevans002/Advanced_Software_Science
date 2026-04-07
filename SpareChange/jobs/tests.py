@@ -4,6 +4,7 @@ from .models import JobPost
 from users.models import base_user
 from datetime import date, timedelta
 from .forms import JobPostForm
+from django.core.exceptions import ValidationError
 
 class JobModelTests(TestCase):
     """Tests for the JobPost model"""
@@ -38,7 +39,6 @@ class JobModelTests(TestCase):
     
     def test_job_string_representation(self):
         """Test the string representation of the job"""
-        # This will pass once you add __str__ to your model
         self.assertEqual(str(self.job), 'Test Job')
     
     def test_job_default_hidden_false(self):
@@ -52,7 +52,8 @@ class JobModelTests(TestCase):
             title='Negotiable Job',
             description='Pay negotiable',
             location='Test City',
-            price_type='NG'
+            price_type='NG',
+            start_date=date.today()  # Add start date
         )
         self.assertIsNone(job2.pay)
         self.assertEqual(job2.get_price_type_display(), 'Negotiable')
@@ -76,7 +77,8 @@ class JobViewTests(TestCase):
             description='Test description',
             location='Test City',
             pay=50.00,
-            price_type='HR'
+            price_type='HR',
+            start_date=date.today()  # Add start date
         )
     
     def test_homepage_displays_jobs(self):
@@ -94,7 +96,8 @@ class JobViewTests(TestCase):
             title='Hidden Job',
             description='Should not appear',
             location='Hidden City',
-            hide_from_listings=True
+            hide_from_listings=True,
+            start_date=date.today()  # Add start date
         )
         
         response = self.client.get(reverse('home'))
@@ -112,7 +115,6 @@ class JobViewTests(TestCase):
         """Test that non-logged in users can't access create job page"""
         response = self.client.get(reverse('create_job'))
         self.assertEqual(response.status_code, 302)  # Redirect to login
-        # Fix: Use the correct login URL pattern
         self.assertRedirects(response, f'/accounts/login/?next={reverse("create_job")}')
     
     def test_create_job_post(self):
@@ -126,6 +128,7 @@ class JobViewTests(TestCase):
             'pay': 75.00,
             'price_type': 'FL',
             'estimated_hours': 5,
+            'start_date': date.today().isoformat(),  # Add start date
         })
         
         # Check that job was created
@@ -146,6 +149,7 @@ class JobViewTests(TestCase):
             'description': 'Pay negotiable',
             'location': 'Test City',
             'price_type': 'NG',  # Negotiable
+            'start_date': date.today().isoformat(),  # Add start date
             # No pay field
         })
         
@@ -162,6 +166,7 @@ class JobViewTests(TestCase):
             'description': 'Test',
             'location': 'Test',
             'price_type': 'FL',
+            'start_date': date.today().isoformat(),  # Add start date
         })
         
         self.assertEqual(response.status_code, 200)  # Stays on form page
@@ -186,7 +191,8 @@ class JobOrderingTests(TestCase):
             title='Old Job',
             description='Old',
             location='City',
-            price_type='FL'
+            price_type='FL',
+            start_date=date.today()  # Add start date
         )
         # Manually set created_at to 2 days ago
         self.old_job.created_at = timezone.now() - timedelta(days=2)
@@ -197,7 +203,8 @@ class JobOrderingTests(TestCase):
             title='New Job',
             description='New',
             location='City',
-            price_type='FL'
+            price_type='FL',
+            start_date=date.today()  # Add start date
         )
         # created_at auto-set to now
     
@@ -221,8 +228,8 @@ class JobPostFormTests(TestCase):
             'pay': 100.00,
             'price_type': 'FL',
             'estimated_hours': 10,
-            'start_date': date.today(),
-            'end_date': date.today() + timedelta(days=7),
+            'start_date': date.today().isoformat(),
+            'end_date': (date.today() + timedelta(days=7)).isoformat(),
             'is_recurring': False,
         }
         form = JobPostForm(data=form_data)
@@ -235,6 +242,8 @@ class JobPostFormTests(TestCase):
             'description': 'Test Description',
             'location': 'Test City',
             'price_type': 'FL',
+            'pay': 50.00,
+            'start_date': date.today().isoformat(),  # Add start date
         }
         form = JobPostForm(data=form_data)
         self.assertTrue(form.is_valid())
@@ -245,6 +254,7 @@ class JobPostFormTests(TestCase):
             'description': 'Test',
             'location': 'Test',
             'price_type': 'FL',
+            'start_date': date.today().isoformat(),  # Add start date
         }
         form = JobPostForm(data=form_data)
         self.assertFalse(form.is_valid())
@@ -256,6 +266,7 @@ class JobPostFormTests(TestCase):
             'title': 'Test Job',
             'description': 'Test',
             'location': 'Test',
+            'start_date': date.today().isoformat(),  # Add start date
         }
         form = JobPostForm(data=form_data)
         self.assertFalse(form.is_valid())
@@ -275,3 +286,299 @@ class JobPostFormTests(TestCase):
         self.assertEqual(form.fields['start_date'].widget.__class__.__name__, 'DateInput')
         self.assertEqual(form.fields['end_date'].widget.__class__.__name__, 'DateInput')
         self.assertIn('type="date"', str(form['start_date']))
+
+
+# ADDED TESTS FOR NEGATIVE PAY VALIDATION
+class JobModelValidationTests(TestCase):
+    """Test model validations"""
+    
+    def setUp(self):
+        self.user = base_user.objects.create_user(
+            username='testuser',
+            password='testpass123'
+        )
+    
+    def test_pay_cannot_be_negative(self):
+        """Test that negative pay raises validation error"""
+        job = JobPost(
+            poster=self.user,
+            title='Test Job',
+            description='Test Description',
+            location='Test City',
+            pay=-50.00,  # Negative pay
+            price_type='FL',
+            start_date=date.today()  # Add start date
+        )
+        
+        with self.assertRaises(ValidationError):
+            job.full_clean()
+    
+    def test_pay_cannot_be_zero(self):
+        """Test that zero pay raises validation error"""
+        job = JobPost(
+            poster=self.user,
+            title='Test Job',
+            description='Test Description',
+            location='Test City',
+            pay=0.00,  # Zero pay
+            price_type='FL',
+            start_date=date.today()  # Add start date
+        )
+        
+        with self.assertRaises(ValidationError):
+            job.full_clean()
+    
+    def test_pay_required_for_flat_rate(self):
+        """Test that pay is required for flat rate jobs"""
+        job = JobPost(
+            poster=self.user,
+            title='Test Job',
+            description='Test Description',
+            location='Test City',
+            pay=None,  # No pay
+            price_type='FL',  # Flat rate requires pay
+            start_date=date.today()  # Add start date
+        )
+        
+        with self.assertRaises(ValidationError):
+            job.full_clean()
+    
+    def test_pay_optional_for_negotiable(self):
+        """Test that pay can be null for negotiable jobs"""
+        job = JobPost(
+            poster=self.user,
+            title='Test Job',
+            description='Test Description',
+            location='Test City',
+            pay=None,
+            price_type='NG',  # Negotiable
+            start_date=date.today()  # Add start date
+        )
+        
+        try:
+            job.full_clean()
+        except ValidationError:
+            self.fail("Negotiable job with null pay raised validation error")
+    
+    def test_positive_pay_valid(self):
+        """Test that positive pay is valid"""
+        job = JobPost(
+            poster=self.user,
+            title='Test Job',
+            description='Test Description',
+            location='Test City',
+            pay=50.00,  # Positive pay
+            price_type='FL',
+            start_date=date.today()  # Add start date
+        )
+        
+        try:
+            job.full_clean()
+        except ValidationError:
+            self.fail("Valid job with positive pay raised validation error")
+
+
+# ADDED TESTS FOR DATE VALIDATION
+class JobDateValidationTests(TestCase):
+    """Test date validations for jobs"""
+    
+    def setUp(self):
+        self.user = base_user.objects.create_user(
+            username='testuser',
+            password='testpass123'
+        )
+    
+    def test_start_date_required(self):
+        """Test that start date is required"""
+        job = JobPost(
+            poster=self.user,
+            title='Test Job',
+            description='Test Description',
+            location='Test City',
+            price_type='FL',
+            pay=50.00,
+            start_date=None  # No start date
+        )
+        
+        with self.assertRaises(ValidationError):
+            job.full_clean()
+    
+    def test_start_date_cannot_be_in_past(self):
+        """Test that start date in the past raises validation error"""
+        past_date = date.today() - timedelta(days=1)
+        
+        job = JobPost(
+            poster=self.user,
+            title='Test Job',
+            description='Test Description',
+            location='Test City',
+            price_type='FL',
+            pay=50.00,
+            start_date=past_date
+        )
+        
+        with self.assertRaises(ValidationError):
+            job.full_clean()
+    
+    def test_end_date_cannot_be_in_past(self):
+        """Test that end date in the past raises validation error"""
+        past_date = date.today() - timedelta(days=1)
+        
+        job = JobPost(
+            poster=self.user,
+            title='Test Job',
+            description='Test Description',
+            location='Test City',
+            price_type='FL',
+            pay=50.00,
+            start_date=date.today(),
+            end_date=past_date
+        )
+        
+        with self.assertRaises(ValidationError):
+            job.full_clean()
+    
+    def test_start_date_can_be_today(self):
+        """Test that start date can be today"""
+        today = date.today()
+        
+        job = JobPost(
+            poster=self.user,
+            title='Test Job',
+            description='Test Description',
+            location='Test City',
+            price_type='FL',
+            pay=50.00,
+            start_date=today
+        )
+        
+        try:
+            job.full_clean()
+        except ValidationError:
+            self.fail("Start date of today raised validation error")
+    
+    def test_start_date_can_be_future(self):
+        """Test that start date can be in the future"""
+        future_date = date.today() + timedelta(days=7)
+        
+        job = JobPost(
+            poster=self.user,
+            title='Test Job',
+            description='Test Description',
+            location='Test City',
+            price_type='FL',
+            pay=50.00,
+            start_date=future_date
+        )
+        
+        try:
+            job.full_clean()
+        except ValidationError:
+            self.fail("Future start date raised validation error")
+    
+    def test_end_date_after_start_date(self):
+        """Test that end date must be after start date"""
+        start_date = date.today() + timedelta(days=7)
+        end_date = date.today() + timedelta(days=1)
+        
+        job = JobPost(
+            poster=self.user,
+            title='Test Job',
+            description='Test Description',
+            location='Test City',
+            price_type='FL',
+            pay=50.00,
+            start_date=start_date,
+            end_date=end_date
+        )
+        
+        with self.assertRaises(ValidationError):
+            job.full_clean()
+    
+    def test_end_date_after_start_date_valid(self):
+        """Test that end date after start date is valid"""
+        start_date = date.today() + timedelta(days=1)
+        end_date = date.today() + timedelta(days=7)
+        
+        job = JobPost(
+            poster=self.user,
+            title='Test Job',
+            description='Test Description',
+            location='Test City',
+            price_type='FL',
+            pay=50.00,
+            start_date=start_date,
+            end_date=end_date
+        )
+        
+        try:
+            job.full_clean()
+        except ValidationError:
+            self.fail("Valid date range raised validation error")
+    
+    def test_form_start_date_required(self):
+        """Test that form shows error when start date is missing"""
+        form_data = {
+            'title': 'Test Job',
+            'description': 'Test Description',
+            'location': 'Test City',
+            'price_type': 'FL',
+            'pay': 50.00,
+        }
+        
+        form = JobPostForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('start_date', form.errors)
+    
+    def test_form_start_date_past_error(self):
+        """Test that form shows error for past start date"""
+        past_date = date.today() - timedelta(days=1)
+        
+        form_data = {
+            'title': 'Test Job',
+            'description': 'Test Description',
+            'location': 'Test City',
+            'price_type': 'FL',
+            'pay': 50.00,
+            'start_date': past_date.isoformat()
+        }
+        
+        form = JobPostForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('start_date', form.errors)
+    
+    def test_form_end_date_past_error(self):
+        """Test that form shows error for past end date"""
+        past_date = date.today() - timedelta(days=1)
+        
+        form_data = {
+            'title': 'Test Job',
+            'description': 'Test Description',
+            'location': 'Test City',
+            'price_type': 'FL',
+            'pay': 50.00,
+            'start_date': date.today().isoformat(),
+            'end_date': past_date.isoformat()
+        }
+        
+        form = JobPostForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('end_date', form.errors)
+    
+    def test_form_dates_valid(self):
+        """Test that valid dates pass form validation"""
+        start_date = date.today()
+        end_date = date.today() + timedelta(days=14)
+        
+        form_data = {
+            'title': 'Test Job',
+            'description': 'Test Description',
+            'location': 'Test City',
+            'price_type': 'FL',
+            'pay': 50.00,
+            'start_date': start_date.isoformat(),
+            'end_date': end_date.isoformat()
+        }
+        
+        form = JobPostForm(data=form_data)
+        self.assertTrue(form.is_valid())
