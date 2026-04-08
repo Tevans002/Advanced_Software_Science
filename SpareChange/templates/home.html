@@ -39,6 +39,18 @@
         {% endif %}
       </div>
       <p class="job-poster">Posted by {{ job.poster.username }}</p>
+      {% if user.is_superuser or user.is_staff %}
+      <div style="margin-top: 10px;">
+        <form action="{% url 'delete_job' job.id %}" method="POST"
+          onsubmit="return confirm('Are you sure you want to delete this job?');">
+          {% csrf_token %}
+          <button type="submit"
+            style="background-color: #e53e3e; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+            Delete Job
+          </button>
+        </form>
+      </div>
+      {% endif %}
     </article>
     {% endfor %}
   </div>
