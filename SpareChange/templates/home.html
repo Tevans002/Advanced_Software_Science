@@ -49,6 +49,32 @@
         {% endif %}
       </div>
       <p class="job-poster">Posted by {{ job.poster.username }}</p>
+      {% if user.is_superuser or user.is_staff %}
+      <div style="margin-top: 10px">
+        <form
+          action="{% url 'delete_job' job.id %}"
+          method="POST"
+          onsubmit="
+            return confirm('Are you sure you want to delete this job?');
+          "
+        >
+          {% csrf_token %}
+          <button
+            type="submit"
+            style="
+              background-color: #e53e3e;
+              color: white;
+              border: none;
+              padding: 5px 10px;
+              border-radius: 5px;
+              cursor: pointer;
+            "
+          >
+            Delete Job
+          </button>
+        </form>
+      </div>
+      {% endif %}
     </article>
     {% endfor %}
   </div>
@@ -56,141 +82,4 @@
   <p class="job-empty">No jobs posted yet. Be the first to post one.</p>
   {% endif %}
 </section>
-
-<!-- Job Details Modal -->
-<div id="jobModal" class="job-modal-overlay" onclick="closeJobModal(event)">
-  <div class="modal-popup" onclick="event.stopPropagation()">
-    <button class="modal-cancel" onclick="closeJobModal()">✕</button>
-    <h2 class="modal-title" id="modalJobTitle"></h2>
-    <p class="modal-date" id="modalJobDate"></p>
-    <p class="modal-description" id="modalJobDescription"></p>
-
-    <div class="modal-contact-section">
-      <div class="contact-avatar"></div>
-      <div class="contact-info">
-        <p class="modal-contact">
-          How to contact: <strong id="modalJobPoster"></strong>
-        </p>
-        <p class="modal-price">Price: $<span id="modalJobPrice"></span></p>
-      </div>
-    </div>
-
-    <button
-      id="modalConfirmBtn"
-      class="modal-confirm"
-      onclick="confirmCurrentJob()"
-    >
-      Confirm
-    </button>
-  </div>
-</div>
-
-<!-- Confirmation Modal -->
-<div
-  id="confirmationModal"
-  class="confirmation-modal-overlay"
-  onclick="closeConfirmationModal(event)"
->
-  <div class="confirmation-modal">
-    <p class="confirmation-text">Your job was confirmed</p>
-    <button class="confirmation-btn" onclick="returnToHome()">Okay</button>
-  </div>
-</div>
-
-<script>
-  // Tracks which card opened the modal so we can confirm/remove that exact job.
-  let activeJobCard = null;
-
-  function openJobModal(card) {
-    activeJobCard = card;
-    const modal = document.getElementById("jobModal");
-    document.getElementById("modalJobTitle").textContent =
-      card.dataset.jobTitle;
-    document.getElementById("modalJobDate").textContent = card.dataset.jobDate;
-    document.getElementById("modalJobDescription").textContent =
-      card.dataset.jobDescription;
-    document.getElementById("modalJobPoster").textContent =
-      card.dataset.jobPoster;
-    document.getElementById("modalJobPrice").textContent = card.dataset.jobPay;
-    modal.classList.add("active");
-  }
-
-  function closeJobModal(event) {
-    if (event && event.target.id !== "jobModal") return;
-    document.getElementById("jobModal").classList.remove("active");
-  }
-
-  function showConfirmationModal() {
-    closeJobModal();
-    document.getElementById("confirmationModal").classList.add("active");
-  }
-
-  function resetConfirmButton() {
-    const btn = document.getElementById("modalConfirmBtn");
-    btn.disabled = false;
-    btn.textContent = "Confirm";
-  }
-
-  function removeCardFromGrid(card) {
-    if (!card) return;
-    const grid = card.closest(".job-grid");
-    card.remove();
-
-    // If no cards remain, swap the grid for the existing empty-state message.
-    if (grid && !grid.querySelector(".job-card")) {
-      const section = document.querySelector(".job-section");
-      if (section) {
-        grid.remove();
-        const emptyMessage = document.createElement("p");
-        emptyMessage.className = "job-empty";
-        emptyMessage.textContent =
-          "No jobs posted yet. Be the first to post one.";
-        section.appendChild(emptyMessage);
-      }
-    }
-  }
-
-  async function confirmCurrentJob() {
-    if (!activeJobCard) return;
-
-    const btn = document.getElementById("modalConfirmBtn");
-    btn.disabled = true;
-    btn.textContent = "Confirming...";
-
-    const jobId = activeJobCard.dataset.jobId;
-
-    try {
-      // Persist confirmation so the job is hidden on future homepage loads.
-      const response = await fetch(`/jobs/${jobId}/confirm/`, {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": "{{ csrf_token }}",
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to confirm job.");
-      }
-
-      // Immediately remove the confirmed card from the current homepage view.
-      removeCardFromGrid(activeJobCard);
-      activeJobCard = null;
-      showConfirmationModal();
-    } catch (error) {
-      alert("Could not confirm this job right now. Please try again.");
-    } finally {
-      resetConfirmButton();
-    }
-  }
-
-  function closeConfirmationModal(event) {
-    if (event && event.target.id !== "confirmationModal") return;
-    document.getElementById("confirmationModal").classList.remove("active");
-  }
-
-  function returnToHome() {
-    closeConfirmationModal();
-  }
-</script>
 {% endblock %}
