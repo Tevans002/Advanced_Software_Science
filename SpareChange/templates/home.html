@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% block content %}
 <!-- for having the map circle on the jobs cards-if we move them we need to move this too -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <div class="hero {% if jobs %}hero-compact{% endif %}">
@@ -32,12 +32,12 @@
       class="job-card"
       data-job-id="{{ job.id }}"
       data-job-title="{{ job.title }}"
+      data-job-price-type="{{ job.price_type }}"
       data-job-date="{{ job.created_at|date:'M d, Y' }}"
       data-job-description="{{ job.description }}"
       data-job-location="{{ job.location }}"
       data-job-pay="{{ job.pay }}"
       data-job-poster="{{ job.poster.username }}"
-      onclick="openJobModal(this)"
     >
       <div class="job-card-top">
         <h3>{{ job.title }}</h3>
@@ -58,38 +58,36 @@
       <p class="job-poster">Posted by {{ job.poster.username }}</p>
       {% if job.location_proxy %}
       <p class="job-map-heading">Approximate location</p>
-        <div id="map-{{ job.id }}" class="job-map"></div>
-        <!-- if this script looks angry in your IDE, ignore that. its fine. trust. -->
-        <script>
-          var map{{ job.id }} = L.map('map-{{ job.id }}').setView([{{ job.location_proxy.fuzzed_lat }}, {{ job.location_proxy.fuzzed_lng }}], 12);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map{{ job.id }});
-          L.circle([{{ job.location_proxy.fuzzed_lat }}, {{ job.location_proxy.fuzzed_lng }}], { radius: 1609 }).addTo(map{{ job.id }});
-          L.circleMarker([{{ job.location_proxy.fuzzed_lat }}, {{ job.location_proxy.fuzzed_lng }}], { radius: 5, color: '#4A90E2', fillOpacity: 1 }).addTo(map{{ job.id }});
-          setTimeout(function() { map{{ job.id }}.invalidateSize(); }, 100);
-        </script>
-      {% endif %}
-      {% if user.is_superuser or user.is_staff %}
-      <div style="margin-top: 10px">
+      <div id="map-{{ job.id }}" class="job-map"></div>
+      <!-- if this script looks angry in your IDE, ignore that. its fine. trust. -->
+      <script>
+        var map{{ job.id }} = L.map('map-{{ job.id }}').setView([{{ job.location_proxy.fuzzed_lat }}, {{ job.location_proxy.fuzzed_lng }}], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map{{ job.id }});
+        L.circle([{{ job.location_proxy.fuzzed_lat }}, {{ job.location_proxy.fuzzed_lng }}], { radius: 1609 }).addTo(map{{ job.id }});
+        L.circleMarker([{{ job.location_proxy.fuzzed_lat }}, {{ job.location_proxy.fuzzed_lng }}], { radius: 5, color: '#4A90E2', fillOpacity: 1 }).addTo(map{{ job.id }});
+        setTimeout(function() { map{{ job.id }}.invalidateSize(); }, 100);
+      </script>
+      {% endif %} {% if user.is_superuser or user.is_staff %}
+      <div class="job-card-actions">
         <form
+          class="job-delete-form"
           action="{% url 'delete_job' job.id %}"
           method="POST"
-          onsubmit="
-            return confirm('Are you sure you want to delete this job?');
-          "
         >
           {% csrf_token %}
           <button
             type="submit"
-            style="
-              background-color: #e53e3e;
-              color: white;
-              border: none;
-              padding: 5px 10px;
-              border-radius: 5px;
-              cursor: pointer;
-            "
+            class="job-action-btn job-delete-btn"
+            data-action-label="Delete Job"
           >
             Delete Job
+          </button>
+          <button
+            type="submit"
+            class="job-action-btn job-confirm-btn"
+            data-action-label="Confirm"
+          >
+            Confirm
           </button>
         </form>
       </div>
@@ -101,4 +99,80 @@
   <p class="job-empty">No jobs posted yet. Be the first to post one.</p>
   {% endif %}
 </section>
+
+<div id="deleteConfirmModal" class="modal-overlay" style="display: none">
+  <div
+    class="modal-box confirm-job-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="deleteConfirmTitle"
+  >
+    <h3 id="deleteConfirmTitle">Confirm Action</h3>
+    <p id="deleteConfirmMessage" class="confirm-modal-message">
+      Are you sure you want to delete this job?
+    </p>
+    <div class="modal-actions confirm-modal-actions">
+      <button type="button" class="btn btn-decline" id="deleteConfirmNo">
+        No
+      </button>
+      <button type="button" class="btn job-confirm-btn" id="deleteConfirmYes">
+        Yes
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const modal = document.getElementById("deleteConfirmModal");
+    const message = document.getElementById("deleteConfirmMessage");
+    const noButton = document.getElementById("deleteConfirmNo");
+    const yesButton = document.getElementById("deleteConfirmYes");
+    let pendingForm = null;
+
+    function closeConfirmModal() {
+      modal.style.display = "none";
+      document.body.style.overflow = "";
+      pendingForm = null;
+    }
+
+    function openConfirmModal(actionLabel, form) {
+      pendingForm = form;
+      message.textContent = `Are you sure you want to proceed with ${actionLabel.toLowerCase()}?`;
+      modal.style.display = "flex";
+      document.body.style.overflow = "hidden";
+    }
+
+    document.querySelectorAll(".job-delete-form").forEach(function (form) {
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const actionLabel =
+          event.submitter?.dataset.actionLabel || "this action";
+        openConfirmModal(actionLabel, form);
+      });
+    });
+
+    yesButton.addEventListener("click", function () {
+      if (pendingForm) {
+        const formToSubmit = pendingForm;
+        closeConfirmModal();
+        formToSubmit.submit();
+      }
+    });
+
+    noButton.addEventListener("click", closeConfirmModal);
+
+    modal.addEventListener("click", function (event) {
+      if (event.target === modal) {
+        closeConfirmModal();
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && modal.style.display !== "none") {
+        closeConfirmModal();
+      }
+    });
+  })();
+</script>
 {% endblock %}

@@ -307,6 +307,86 @@ nav a {
   justify-content: flex-end;
 }
 
+.job-detail-modal {
+  max-width: 620px;
+}
+
+.job-modal-title {
+  margin-bottom: 8px;
+  text-align: center;
+  color: var(--accent-primary);
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.job-modal-location {
+  margin-bottom: 18px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.job-modal-main {
+  margin-bottom: 18px;
+}
+
+.job-modal-description {
+  margin-bottom: 12px;
+  color: var(--text-primary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.job-modal-pay-line {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.job-modal-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 14px;
+  margin-top: 12px;
+  border-top: 1px solid var(--job-card-border-top);
+}
+
+.job-modal-profile {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--job-card-badge-bg);
+  border: 1px solid var(--job-card-badge-border);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.job-modal-meta-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.job-modal-poster {
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.job-modal-date {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.job-modal-actions {
+  justify-content: flex-end;
+  margin-top: 22px;
+}
+
 .btn-decline {
   background: rgba(200, 50, 50, 0.15);
   border-color: rgba(200, 50, 50, 0.4);
@@ -518,6 +598,67 @@ nav a {
   margin-top: 10px;
   font-size: 0.9rem;
   color: var(--text-secondary);
+}
+
+.job-card-actions {
+  margin-top: 12px;
+  display: flex;
+  width: 100%;
+}
+
+.job-card-actions form {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.job-action-btn {
+  width: auto;
+  margin-top: 0;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.job-delete-btn {
+  background-color: #e53e3e;
+  color: white;
+}
+
+.job-delete-btn:hover {
+  background-color: #c53030;
+  transform: translateY(-1px);
+}
+
+.job-confirm-btn {
+  background: #497e4f;
+  color: white;
+}
+
+.job-confirm-btn:hover {
+  background: #47704c;
+  transform: translateY(-1px);
+}
+
+.confirm-job-modal {
+  max-width: 460px;
+  background: var(--card-bg);
+  border: 1px solid var(--job-card-badge-border);
+}
+
+.confirm-modal-message {
+  margin-bottom: 20px;
+  text-align: left;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.confirm-modal-actions {
+  justify-content: flex-end;
 }
 
 .job-empty {
