@@ -114,7 +114,7 @@
 
     <!-- Is Recurring Field -->
     <div class="field-wrap">
-      <label for="{{ form.is_recurring.id_for_label }}">
+      <label for="{{ form.is_recurring.id_for_label }}" class="checkbox-inline">
         {{ form.is_recurring }} Is this a recurring job?
       </label>
       {% if form.is_recurring.errors %}
@@ -126,7 +126,7 @@
       {% endif %}
     </div>
 
-    <button type="submit">Post Job</button>
+    <button type="submit" class="btn">Post Job</button>
   </form>
 </div>
 {% endblock %}

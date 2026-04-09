@@ -183,7 +183,8 @@ nav a {
 }
 
 .auth-container input,
-.auth-container textarea {
+.auth-container textarea,
+.auth-container select {
   width: 100%;
   padding: 12px;
   margin: 10px 0;
@@ -208,6 +209,18 @@ nav a {
   font-weight: 600;
   color: var(--text-secondary);
   transition: color 0.3s ease;
+}
+
+.auth-container .checkbox-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-container .checkbox-inline input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  padding: 0;
 }
 
 .form-note {
