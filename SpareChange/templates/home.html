@@ -43,7 +43,9 @@
       <div class="job-meta">
         <span>{{ job.location }}</span>
         {% if job.pay %}
-        <span>${{ job.pay }}</span>
+        <span>
+          ${{ job.pay }}{% if job.price_type == 'HR' %}/hr{% endif %}
+        </span>
         {% else %}
         <span>Pay negotiable</span>
         {% endif %}
