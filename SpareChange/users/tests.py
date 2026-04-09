@@ -4,6 +4,13 @@ from django.urls import reverse
 # from django.contrib.auth.models import User
 from users.models import base_user
 
+from unittest.mock import patch
+
+geocode_patch = patch(
+    "location.models.Location._geocode", return_value=(46.8721, -113.9940)
+)
+geocode_patch.start()
+
 
 class LoginSystemTest(TestCase):
 

@@ -18,6 +18,7 @@ class base_user(AbstractUser):
         related_name="user",
     )
 
+    # location proxy override save
     def save(self, *args, **kwargs):
         from location.models import Location
 
