@@ -40,7 +40,7 @@
 
     <!-- Location Field -->
     <div class="field-wrap">
-      <label for="{{ form.location.id_for_label }}">Location:</label>
+      <label for="{{ form.location.id_for_label }}">Address:</label>
       {{ form.location }} {% if form.location.errors %}
       <div class="field-errors">
         {% for error in form.location.errors %}
@@ -114,7 +114,7 @@
 
     <!-- Is Recurring Field -->
     <div class="field-wrap">
-      <label for="{{ form.is_recurring.id_for_label }}" class="checkbox-inline">
+      <label for="{{ form.is_recurring.id_for_label }}">
         {{ form.is_recurring }} Is this a recurring job?
       </label>
       {% if form.is_recurring.errors %}
@@ -126,7 +126,7 @@
       {% endif %}
     </div>
 
-    <button type="submit" class="btn">Post Job</button>
+    <button type="submit">Post Job</button>
   </form>
 </div>
 {% endblock %}

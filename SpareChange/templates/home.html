@@ -1,4 +1,8 @@
 {% extends "base.html" %} {% block content %}
+<!-- for having the map circle on the jobs cards-if we move them we need to move this too -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 <div class="hero {% if jobs %}hero-compact{% endif %}">
   {% if not user.is_authenticated %}
   <p style="color: white; font-size: 18px; margin-top: 30px">
@@ -41,7 +45,8 @@
       </div>
       <p class="job-desc">{{ job.description|truncatechars:150 }}</p>
       <div class="job-meta">
-        <span>{{ job.location }}</span>
+        <!-- should not have location listed for privacy -->
+        <!-- <span>{{ job.location }}</span> -->
         {% if job.pay %}
         <span>
           ${{ job.pay }}{% if job.price_type == 'HR' %}/hr{% endif %}
@@ -51,6 +56,18 @@
         {% endif %}
       </div>
       <p class="job-poster">Posted by {{ job.poster.username }}</p>
+      {% if job.location_proxy %}
+      <p class="job-map-heading">Approximate location</p>
+        <div id="map-{{ job.id }}" class="job-map"></div>
+        <!-- if this script looks angry in your IDE, ignore that. its fine. trust. -->
+        <script>
+          var map{{ job.id }} = L.map('map-{{ job.id }}').setView([{{ job.location_proxy.fuzzed_lat }}, {{ job.location_proxy.fuzzed_lng }}], 12);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map{{ job.id }});
+          L.circle([{{ job.location_proxy.fuzzed_lat }}, {{ job.location_proxy.fuzzed_lng }}], { radius: 1609 }).addTo(map{{ job.id }});
+          L.circleMarker([{{ job.location_proxy.fuzzed_lat }}, {{ job.location_proxy.fuzzed_lng }}], { radius: 5, color: '#4A90E2', fillOpacity: 1 }).addTo(map{{ job.id }});
+          setTimeout(function() { map{{ job.id }}.invalidateSize(); }, 100);
+        </script>
+      {% endif %}
       {% if user.is_superuser or user.is_staff %}
       <div style="margin-top: 10px">
         <form

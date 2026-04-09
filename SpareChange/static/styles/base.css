@@ -528,6 +528,19 @@ nav a {
   padding: 16px;
 }
 
+/* Leaflet map in job cards */
+.job-map {
+    height: 150px;
+    border-radius: 8px;
+    margin-top: 4px;
+}
+
+.job-map-heading {
+  font-size: .7rem; 
+  color: var(--text-secondary); 
+  margin-top: 10px;
+}
+
 /* Style Django's default error list */
 .errorlist,
 ul.errorlist {

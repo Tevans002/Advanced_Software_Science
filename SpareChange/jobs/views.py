@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_protect
 from .forms import JobPostForm
-from .models import JobPost
+from django.http import JsonResponse
+from jobs.models import JobPost
 
 
 @login_required
@@ -20,16 +21,17 @@ def create_job(request):
 
     return render(request, "jobs/create_job.html", {"form": JobPostForm()})
 
+
 @login_required
 def delete_job(request, job_id):
     from users.user_decorators import NormalUserComponent, AdminUserDecorator
     from django.contrib import messages
-    
+
     user_component = NormalUserComponent(request.user)
-    
+
     if request.user.is_superuser or request.user.is_staff:
         user_component = AdminUserDecorator(user_component)
-    
+
     if user_component.can_delete():
         success, message = user_component.delete_job(job_id)
         if success:
@@ -37,6 +39,8 @@ def delete_job(request, job_id):
         else:
             messages.error(request, message)
     else:
-        messages.error(request, "Permission denied. Only administrators can delete jobs.")
-        
+        messages.error(
+            request, "Permission denied. Only administrators can delete jobs."
+        )
+
     return redirect("home")
