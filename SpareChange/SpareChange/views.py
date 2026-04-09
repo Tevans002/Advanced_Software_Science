@@ -11,8 +11,10 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["jobs"] = JobPost.objects.filter(hide_from_listings=False).order_by(
-            "-created_at"
+        context["jobs"] = (
+            JobPost.objects.select_related("location_proxy")
+            .filter(hide_from_listings=False)
+            .order_by("-created_at")
         )
         return context
 
