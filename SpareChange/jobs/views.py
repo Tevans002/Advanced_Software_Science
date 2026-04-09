@@ -1,5 +1,8 @@
-from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_protect
 from .forms import JobPostForm
 from django.http import JsonResponse
 from jobs.models import JobPost

@@ -91,7 +91,7 @@
 
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  background: linear-gradient(#12591bc1 0%, #10291d 100%);
   min-height: 100vh;
   transition: background 0.3s ease;
 }
@@ -133,28 +133,24 @@ nav a {
   font-size: 1.2rem;
 }
 
-nav a:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
 .container {
   padding: 20px;
 }
 
 .btn {
-  background: var(--button-bg);
+  background: #497e4f;
   backdrop-filter: blur(10px);
   color: var(--text-primary);
   padding: 12px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.45);
   border-radius: 10px;
+  border: none;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.25s ease;
 }
 
 .btn:hover {
-  background: var(--button-hover);
+  background: #47704c;
   transform: translateY(-1px);
 }
 
@@ -186,7 +182,9 @@ nav a:hover {
   margin-bottom: 8px;
 }
 
-.auth-container input {
+.auth-container input,
+.auth-container textarea,
+.auth-container select {
   width: 100%;
   padding: 12px;
   margin: 10px 0;
@@ -199,6 +197,11 @@ nav a:hover {
   transition: all 0.3s ease;
 }
 
+.auth-container textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
 .auth-container label {
   display: block;
   text-align: left;
@@ -206,6 +209,18 @@ nav a:hover {
   font-weight: 600;
   color: var(--text-secondary);
   transition: color 0.3s ease;
+}
+
+.auth-container .checkbox-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-container .checkbox-inline input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  padding: 0;
 }
 
 .form-note {
@@ -290,6 +305,86 @@ nav a:hover {
   display: flex;
   gap: 12px;
   justify-content: flex-end;
+}
+
+.job-detail-modal {
+  max-width: 620px;
+}
+
+.job-modal-title {
+  margin-bottom: 8px;
+  text-align: center;
+  color: var(--accent-primary);
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.job-modal-location {
+  margin-bottom: 18px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.job-modal-main {
+  margin-bottom: 18px;
+}
+
+.job-modal-description {
+  margin-bottom: 12px;
+  color: var(--text-primary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.job-modal-pay-line {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.job-modal-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 14px;
+  margin-top: 12px;
+  border-top: 1px solid var(--job-card-border-top);
+}
+
+.job-modal-profile {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--job-card-badge-bg);
+  border: 1px solid var(--job-card-badge-border);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.job-modal-meta-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.job-modal-poster {
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.job-modal-date {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.job-modal-actions {
+  justify-content: flex-end;
+  margin-top: 22px;
 }
 
 .btn-decline {
@@ -503,6 +598,67 @@ nav a:hover {
   margin-top: 10px;
   font-size: 0.9rem;
   color: var(--text-secondary);
+}
+
+.job-card-actions {
+  margin-top: 12px;
+  display: flex;
+  width: 100%;
+}
+
+.job-card-actions form {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.job-action-btn {
+  width: auto;
+  margin-top: 0;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.job-delete-btn {
+  background-color: #e53e3e;
+  color: white;
+}
+
+.job-delete-btn:hover {
+  background-color: #c53030;
+  transform: translateY(-1px);
+}
+
+.job-confirm-btn {
+  background: #497e4f;
+  color: white;
+}
+
+.job-confirm-btn:hover {
+  background: #47704c;
+  transform: translateY(-1px);
+}
+
+.confirm-job-modal {
+  max-width: 460px;
+  background: var(--card-bg);
+  border: 1px solid var(--job-card-badge-border);
+}
+
+.confirm-modal-message {
+  margin-bottom: 20px;
+  text-align: left;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.confirm-modal-actions {
+  justify-content: flex-end;
 }
 
 .job-empty {
