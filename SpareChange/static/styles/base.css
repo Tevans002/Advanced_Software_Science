@@ -1,7 +1,7 @@
 /* CSS Variables for Theme Support */
 :root,
 [data-theme="default"] {
-  --bg-gradient-start: #29d03fc1;
+  --bg-gradient-start: #198027c1;
   --bg-gradient-end: #10291d;
   --card-bg: rgba(255, 255, 255, 0.61);
   --nav-bg: rgba(255, 255, 255, 0.61);
@@ -91,8 +91,8 @@
 
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(#12591bc1 0%, #10291d 100%);
   min-height: 100vh;
+  background: linear-gradient(var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
   transition: background 0.3s ease;
 }
 
