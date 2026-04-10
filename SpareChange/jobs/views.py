@@ -32,15 +32,10 @@ def delete_job(request, job_id):
     if request.user.is_superuser or request.user.is_staff:
         user_component = AdminUserDecorator(user_component)
 
-    if user_component.can_delete():
-        success, message = user_component.delete_job(job_id)
-        if success:
-            messages.success(request, message)
-        else:
-            messages.error(request, message)
+    success, message = user_component.delete_job(job_id)
+    if success:
+        messages.success(request, message)
     else:
-        messages.error(
-            request, "Permission denied. Only administrators can delete jobs."
-        )
+        messages.error(request, message)
 
     return redirect("home")

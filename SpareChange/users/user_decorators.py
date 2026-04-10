@@ -1,5 +1,6 @@
 from jobs.models import JobPost
 
+
 class UserComponent:
     def can_delete(self):
         return False
@@ -11,6 +12,15 @@ class UserComponent:
 class NormalUserComponent(UserComponent):
     def __init__(self, django_user):
         self.user = django_user
+
+    def delete_job(self, job_id):
+        try:
+            job = JobPost.objects.get(id=job_id)
+        except JobPost.DoesNotExist:
+            return False, "Job not found."
+
+        job.delete()
+        return True, "Job deleted successfully."
 
 
 class UserDecoratorBase(UserComponent):

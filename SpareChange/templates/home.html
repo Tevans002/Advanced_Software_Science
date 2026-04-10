@@ -67,7 +67,7 @@
         L.circleMarker([{{ job.location_proxy.fuzzed_lat }}, {{ job.location_proxy.fuzzed_lng }}], { radius: 5, color: '#4A90E2', fillOpacity: 1 }).addTo(map{{ job.id }});
         setTimeout(function() { map{{ job.id }}.invalidateSize(); }, 100);
       </script>
-      {% endif %} {% if user.is_superuser or user.is_staff %}
+      {% endif %} {% if user.is_authenticated %}
       <div class="job-card-actions">
         <form
           class="job-delete-form"
@@ -85,7 +85,7 @@
           <button
             type="submit"
             class="job-action-btn job-confirm-btn"
-            data-action-label="Confirm"
+            data-action-label="Confirm Job"
           >
             Confirm
           </button>
@@ -138,7 +138,11 @@
 
     function openConfirmModal(actionLabel, form) {
       pendingForm = form;
-      message.textContent = `Are you sure you want to proceed with ${actionLabel.toLowerCase()}?`;
+      if (actionLabel === "Confirm Job") {
+        message.textContent = "Thank you for confirming the job. This job will now be deleted.";
+      } else {
+        message.textContent = `Are you sure you want to proceed with ${actionLabel.toLowerCase()}?`;
+      }
       modal.style.display = "flex";
       document.body.style.overflow = "hidden";
     }
