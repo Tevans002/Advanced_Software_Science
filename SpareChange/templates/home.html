@@ -139,7 +139,8 @@
     function openConfirmModal(actionLabel, form) {
       pendingForm = form;
       if (actionLabel === "Confirm Job") {
-        message.textContent = "Thank you for confirming the job. This job will now be deleted.";
+        message.textContent =
+          "Thank you for confirming the job. This job will now be deleted.";
       } else {
         message.textContent = `Are you sure you want to proceed with ${actionLabel.toLowerCase()}?`;
       }
