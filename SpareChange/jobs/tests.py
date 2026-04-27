@@ -5,9 +5,8 @@ from users.models import base_user
 from datetime import date, timedelta
 from .forms import JobPostForm
 from django.core.exceptions import ValidationError
-
-
-from unittest.mock import patch
+import json
+from unittest.mock import patch, Mock
 
 # patch geocoding for all tests in this file
 geocode_patch = patch(
@@ -596,3 +595,177 @@ class JobDateValidationTests(TestCase):
 
         form = JobPostForm(data=form_data)
         self.assertTrue(form.is_valid())
+
+# TEST CLASS FOR AI ENHANCEMENT USING LLM
+class AIEnhancementTests(TestCase):
+    """Tests for the AI job description enhancement feature"""
+    
+    def setUp(self):
+        """Set up test client and URL"""
+        self.client = Client()
+        self.enhance_url = reverse('enhance_description')
+        self.user = base_user.objects.create_user(
+            username='testuser',
+            password='testpass123',
+            email='test@example.com'
+        )
+    
+    @patch('jobs.views.ollama_client')
+    def test_enhance_endpoint_returns_success(self, mock_ollama):
+        """Test that enhance endpoint returns enhanced description"""
+        # Mock Ollama response
+        mock_response = {
+            'message': {
+                'content': 'This is an enhanced professional job description.'
+            }
+        }
+        mock_ollama.chat.return_value = mock_response
+        
+        # Make request
+        response = self.client.post(
+            self.enhance_url,
+            data=json.dumps({'description': 'basic job description'}),
+            content_type='application/json'
+        )
+        
+        # Assertions
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data['success'])
+        self.assertIn('enhanced_description', data)
+        self.assertEqual(data['enhanced_description'], 'This is an enhanced professional job description.')
+    
+    def test_enhance_endpoint_handles_empty_description(self):
+        """Test that empty description returns error"""
+        response = self.client.post(
+            self.enhance_url,
+            data=json.dumps({'description': ''}),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertIn('error', data)
+    
+    def test_enhance_endpoint_handles_missing_description(self):
+        """Test that missing description field returns error"""
+        response = self.client.post(
+            self.enhance_url,
+            data=json.dumps({}),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertIn('error', data)
+    
+    @patch('jobs.views.ollama_client')
+    def test_enhance_endpoint_handles_ollama_exception(self, mock_ollama):
+        """Test that Ollama exception is handled gracefully"""
+        # Mock an exception
+        mock_ollama.chat.side_effect = Exception("Ollama connection error")
+        
+        response = self.client.post(
+            self.enhance_url,
+            data=json.dumps({'description': 'test description'}),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 500)
+        data = response.json()
+        self.assertIn('error', data)
+    
+    @patch('jobs.views.ollama_client')
+    def test_enhance_endpoint_handles_very_long_description(self, mock_ollama):
+        """Test that very long descriptions are handled"""
+        # Mock successful Ollama response
+        mock_response = {
+            'message': {
+                'content': 'Enhanced long description'
+            }
+        }
+        mock_ollama.chat.return_value = mock_response
+        
+        # Create a very long description (2000 characters)
+        long_description = "a " * 1000
+        
+        response = self.client.post(
+            self.enhance_url,
+            data=json.dumps({'description': long_description}),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data['success'])
+    
+    def test_enhance_endpoint_requires_post_method(self):
+        """Test that GET requests are not allowed"""
+        response = self.client.get(self.enhance_url)
+        self.assertEqual(response.status_code, 405)  # Method not allowed
+    
+    def test_enhance_endpoint_handles_malformed_json(self):
+        """Test that malformed JSON returns error"""
+        response = self.client.post(
+            self.enhance_url,
+            data='not valid json',
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 500)
+        data = response.json()
+        self.assertIn('error', data)
+    
+    @patch('jobs.views.ollama_client')
+    def test_enhance_endpoint_passes_correct_parameters(self, mock_ollama):
+        """Test that the correct parameters are passed to Ollama"""
+        mock_response = {
+            'message': {
+                'content': 'Enhanced text'
+            }
+        }
+        mock_ollama.chat.return_value = mock_response
+        
+        original_description = "Need a plumber for leaky faucet"
+        
+        response = self.client.post(
+            self.enhance_url,
+            data=json.dumps({'description': original_description}),
+            content_type='application/json'
+        )
+        
+        # Verify Ollama was called once
+        self.assertEqual(mock_ollama.chat.call_count, 1)
+        
+        # Get the arguments passed to ollama_client.chat
+        call_args = mock_ollama.chat.call_args[1]
+        
+        # Verify the correct model was used
+        self.assertEqual(call_args.get('model'), 'llama3.2:1b')
+        
+        # Verify the prompt contains the original description
+        messages = call_args.get('messages', [])
+        self.assertTrue(len(messages) > 0)
+        self.assertIn(original_description, messages[0].get('content', ''))
+    
+    @patch('jobs.views.ollama_client')
+    def test_enhance_endpoint_strips_prompt_artifacts(self, mock_ollama):
+        """Test that the endpoint removes 'Improved description:' prefix if present"""
+        # Mock response that includes the prefix
+        mock_response = {
+            'message': {
+                'content': 'Improved description: This is the actual enhanced text.'
+            }
+        }
+        mock_ollama.chat.return_value = mock_response
+        
+        response = self.client.post(
+            self.enhance_url,
+            data=json.dumps({'description': 'test description'}),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        # The prefix should be stripped
+        self.assertEqual(data['enhanced_description'], 'This is the actual enhanced text.')
