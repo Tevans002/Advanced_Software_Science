@@ -70,7 +70,7 @@ def enhance_description(request):
         - Keep the same core meaning and requirements
         - Make it more professional and engaging
         - Use proper grammar and punctuation
-        - Keep it concise (under 150 words)
+        - Keep it concise (under 50 words)
         - Do NOT add fake company benefits or salary info
         
         Original description:
