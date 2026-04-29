@@ -8,7 +8,9 @@ from django.views.decorators.http import require_http_methods
 
 from .forms import JobPostForm
 
-from ollama import Client
+# Import Ollama's Client and rename OllamaClient
+# SO IT DOES NOT CONFLICT WITH django.test Client in jobs/test.py
+from ollama import Client as OllamaClient
 
 @login_required
 def create_job(request):
@@ -48,7 +50,7 @@ def delete_job(request, job_id):
     return redirect("home")
 
 # Initialize Ollama Client
-ollama_client = Client(host="http://localhost:11434")
+ollama_client = OllamaClient(host="http://localhost:11434")
 
 @require_http_methods(["POST"])
 def enhance_description(request):

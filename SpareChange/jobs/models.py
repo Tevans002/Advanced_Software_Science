@@ -59,6 +59,20 @@ class JobPost(models.Model):
         """Model-level validation"""
         super().clean()
 
+        # Validate location
+        if self.location:
+            location_text = self.location.strip()
+            if not location_text:
+                raise ValidationError({"location": "Location is required."})
+            
+            # Test geocoding the location
+            try:
+                lat, lng = Location._geocode(location_text)
+            except Exception as e:
+                raise ValidationError({
+                    "location": f"Could not validate this address. Please enter a valid city, ZIP code, or street address."
+                })
+
         # validate pay is positive if provided
         if self.pay is not None and self.pay <= 0:
             raise ValidationError({"pay": "Pay amount must be greater than zero."})

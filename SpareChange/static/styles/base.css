@@ -13,8 +13,9 @@
   --accent-secondary: #0b3a26;
   --input-bg: rgba(255, 255, 255, 0.5);
   --input-border: rgba(255, 255, 255, 0.7);
-  --button-bg: rgba(255, 255, 255, 0.22);
-  --button-hover: rgba(255, 255, 255, 0.35);
+  /* --button-bg: rgba(255, 255, 255, 0.22); */
+  --button-bg: rgba(35, 116, 49, 0.71);
+  --button-hover: rgba(35, 116, 49, 0.325);
   --error-bg: rgba(255, 99, 99, 0.18);
   --error-border: rgba(173, 0, 0, 0.35);
   --error-text: #5f0000;
@@ -41,8 +42,9 @@
   --accent-secondary: #e8a0bf;
   --input-bg: rgba(255, 240, 245, 0.7);
   --input-border: rgba(200, 100, 120, 0.5);
-  --button-bg: rgba(255, 240, 245, 0.5);
-  --button-hover: rgba(255, 220, 230, 0.7);
+  /* --button-bg: rgba(255, 240, 245, 0.5); */
+  --button-bg: rgba(223, 92, 125, 0.64);
+  --button-hover: rgba(252, 184, 203, 0.903);
   --error-bg: rgba(255, 99, 99, 0.18);
   --error-border: rgba(173, 0, 0, 0.35);
   --error-text: #5f0000;
@@ -69,8 +71,8 @@
   --accent-secondary: #c0392b;
   --input-bg: rgba(0, 0, 0, 0.5);
   --input-border: rgba(255, 255, 255, 0.3);
-  --button-bg: rgba(0, 0, 0, 0.4);
-  --button-hover: rgba(0, 0, 0, 0.6);
+  --button-bg: rgba(42, 42, 42, 0.4);
+  --button-hover: rgba(90, 90, 90, 0.6);
   --error-bg: rgba(255, 99, 99, 0.25);
   --error-border: rgba(231, 76, 60, 0.5);
   --error-text: #ff6b6b;
@@ -138,7 +140,7 @@ nav a {
 }
 
 .btn {
-  background: #497e4f;
+  background: var(--button-bg);
   backdrop-filter: blur(10px);
   color: var(--text-primary);
   padding: 12px 16px;
@@ -150,7 +152,7 @@ nav a {
 }
 
 .btn:hover {
-  background: #47704c;
+  background: var(--button-hover);
   transform: translateY(-1px);
 }
 

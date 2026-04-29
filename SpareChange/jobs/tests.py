@@ -1,3 +1,4 @@
+import unittest
 from django.test import TestCase, Client
 from django.urls import reverse
 from .models import JobPost
@@ -6,7 +7,7 @@ from datetime import date, timedelta
 from .forms import JobPostForm
 from django.core.exceptions import ValidationError
 import json
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 
 # patch geocoding for all tests in this file
 geocode_patch = patch(
@@ -228,7 +229,7 @@ class JobOrderingTests(TestCase):
         self.assertEqual(jobs[1].title, "Old Job")
 
 
-# Form tests using your actual JobPostForm
+# Form tests for actual JobPostForm
 class JobPostFormTests(TestCase):
     """Test the job creation form"""
 
@@ -285,6 +286,20 @@ class JobPostFormTests(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn("price_type", form.errors)
 
+    def test_pay_too_high(self):
+        """Test that pay over 999,999.99 is rejected"""
+        form_data = {
+            'title': 'Test Job',
+            'description': 'Test Description',
+            'location': 'Test City',
+            'price_type': 'FL',
+            'pay': 1000000.00,
+            'start_date': date.today(),
+        }
+        form = JobPostForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('pay', form.errors)
+
     def test_form_excludes_correct_fields(self):
         """Test that the form excludes the right fields"""
         form = JobPostForm()
@@ -302,6 +317,70 @@ class JobPostFormTests(TestCase):
         self.assertEqual(form.fields["end_date"].widget.__class__.__name__, "DateInput")
         self.assertIn('type="date"', str(form["start_date"]))
 
+        # ========== NEW LOCATION VALIDATION TESTS ==========
+    
+    def test_valid_location_passes_validation(self):
+        """Test that a valid geocodable address passes validation"""
+        form_data = {
+            "title": "Test Job",
+            "description": "Test Description",
+            "location": "Missoula, MT",  # Valid address
+            "price_type": "FL",
+            "pay": 50.00,
+            "start_date": date.today().isoformat(),
+        }
+        form = JobPostForm(data=form_data)
+        self.assertTrue(form.is_valid())
+    
+    def test_invalid_location_fails_validation(self):
+        """Test that an invalid geocodable address fails validation"""
+        # Temporarily patch _geocode to raise ValueError for this test only
+        with patch("location.models.Location._geocode") as mock_geocode:
+            mock_geocode.side_effect = ValueError("Could not geocode: invalid")
+            
+            form_data = {
+                "title": "Test Job",
+                "description": "Test Description",
+                "location": "invalid address that fails",
+                "price_type": "FL",
+                "pay": 50.00,
+                "start_date": date.today().isoformat(),
+            }
+            form = JobPostForm(data=form_data)
+            self.assertFalse(form.is_valid())
+            self.assertIn("location", form.errors)
+    
+    def test_empty_location_fails_validation(self):
+        """Test that empty location fails validation"""
+        form_data = {
+            "title": "Test Job",
+            "description": "Test Description",
+            "location": "",  # Empty
+            "price_type": "FL",
+            "pay": 50.00,
+            "start_date": date.today().isoformat(),
+        }
+        form = JobPostForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("location", form.errors)
+    
+    def test_location_geocode_api_error_handled(self):
+        """Test that API errors are caught and shown to user"""
+        with patch("location.models.Location._geocode") as mock_geocode:
+            # Simulate a network/API error
+            mock_geocode.side_effect = Exception("API connection failed")
+            
+            form_data = {
+                "title": "Test Job",
+                "description": "Test Description",
+                "location": "Some Address",
+                "price_type": "FL",
+                "pay": 50.00,
+                "start_date": date.today().isoformat(),
+            }
+            form = JobPostForm(data=form_data)
+            self.assertFalse(form.is_valid())
+            self.assertIn("location", form.errors)
 
 # ADDED TESTS FOR NEGATIVE PAY VALIDATION
 class JobModelValidationTests(TestCase):
@@ -391,6 +470,42 @@ class JobModelValidationTests(TestCase):
         except ValidationError:
             self.fail("Valid job with positive pay raised validation error")
 
+    # ========== NEW LOCATION MODEL VALIDATION TESTS ==========
+    
+    def test_invalid_location_raises_validation_error_at_model_level(self):
+        """Test that invalid location raises ValidationError in model.clean()"""
+        with patch("location.models.Location._geocode") as mock_geocode:
+            mock_geocode.side_effect = ValueError("Could not geocode")
+            
+            job = JobPost(
+                poster=self.user,
+                title="Test Job",
+                description="Test Description",
+                location="invalid address",
+                price_type="FL",
+                pay=50.00,
+                start_date=date.today(),
+            )
+            
+            with self.assertRaises(ValidationError):
+                job.full_clean()
+    
+    def test_valid_location_passes_model_validation(self):
+        """Test that valid location passes model validation"""
+        job = JobPost(
+            poster=self.user,
+            title="Test Job",
+            description="Test Description",
+            location="Missoula, MT",  # Will use the global patch
+            price_type="FL",
+            pay=50.00,
+            start_date=date.today(),
+        )
+        
+        try:
+            job.full_clean()
+        except ValidationError:
+            self.fail("Valid job with good location raised validation error")
 
 # ADDED TESTS FOR DATE VALIDATION
 class JobDateValidationTests(TestCase):
@@ -597,11 +712,19 @@ class JobDateValidationTests(TestCase):
         self.assertTrue(form.is_valid())
 
 # TEST CLASS FOR AI ENHANCEMENT USING LLM
+try:
+    from ollama import Client as OllamaClient
+    OLLAMA_AVAILABLE = True
+except ImportError:
+    OLLAMA_AVAILABLE = False
+
+@unittest.skipIf(not OLLAMA_AVAILABLE, "Ollama not installed")
 class AIEnhancementTests(TestCase):
     """Tests for the AI job description enhancement feature"""
     
     def setUp(self):
         """Set up test client and URL"""
+        # django client not ollama
         self.client = Client()
         self.enhance_url = reverse('enhance_description')
         self.user = base_user.objects.create_user(
@@ -733,6 +856,12 @@ class AIEnhancementTests(TestCase):
             data=json.dumps({'description': original_description}),
             content_type='application/json'
         )
+
+        # Verify HTTP response is correct
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data['success'])
+        self.assertEqual(data['enhanced_description'], 'Enhanced text')
         
         # Verify Ollama was called once
         self.assertEqual(mock_ollama.chat.call_count, 1)
