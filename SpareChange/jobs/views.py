@@ -8,9 +8,13 @@ from django.views.decorators.http import require_http_methods
 
 from .forms import JobPostForm
 
-# Import Ollama's Client and rename OllamaClient
-# SO IT DOES NOT CONFLICT WITH django.test Client in jobs/test.py
-from ollama import Client as OllamaClient
+
+try:
+    from ollama import Client as OllamaClient
+    OLLAMA_AVAILABLE = True
+except ImportError:
+    OLLAMA_AVAILABLE = False
+    Client = None
 
 @login_required
 def create_job(request):

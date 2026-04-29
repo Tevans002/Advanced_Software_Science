@@ -712,6 +712,8 @@ class JobDateValidationTests(TestCase):
         self.assertTrue(form.is_valid())
 
 # TEST CLASS FOR AI ENHANCEMENT USING LLM
+# Import Ollama's Client and rename OllamaClient
+# SO IT DOES NOT CONFLICT WITH django.test Client in jobs/test.py
 try:
     from ollama import Client as OllamaClient
     OLLAMA_AVAILABLE = True
