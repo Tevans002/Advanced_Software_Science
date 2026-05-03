@@ -67,14 +67,14 @@
         L.circleMarker([{{ job.location_proxy.fuzzed_lat }}, {{ job.location_proxy.fuzzed_lng }}], { radius: 5, color: '#4A90E2', fillOpacity: 1 }).addTo(map{{ job.id }});
         setTimeout(function() { map{{ job.id }}.invalidateSize(); }, 100);
       </script>
-      {% endif %} {% if user.is_superuser or user.is_staff %}
+      {% endif %}
       <div class="job-card-actions">
         <form
           class="job-delete-form"
           action="{% url 'delete_job' job.id %}"
           method="POST"
         >
-          {% csrf_token %}
+          {% csrf_token %} {% if user.is_superuser or user.is_staff %}
           <button
             type="submit"
             class="job-action-btn job-delete-btn"
@@ -82,6 +82,7 @@
           >
             Delete Job
           </button>
+          {% endif %}
           <button
             type="submit"
             class="job-action-btn job-confirm-btn"
@@ -91,7 +92,6 @@
           </button>
         </form>
       </div>
-      {% endif %}
     </article>
     {% endfor %}
   </div>
