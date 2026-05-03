@@ -1,3 +1,4 @@
+import unittest
 from django.test import TestCase, Client
 from django.urls import reverse
 from .models import JobPost
@@ -5,8 +6,7 @@ from users.models import base_user
 from datetime import date, timedelta
 from .forms import JobPostForm
 from django.core.exceptions import ValidationError
-
-
+import json
 from unittest.mock import patch
 
 # patch geocoding for all tests in this file
@@ -229,7 +229,7 @@ class JobOrderingTests(TestCase):
         self.assertEqual(jobs[1].title, "Old Job")
 
 
-# Form tests using your actual JobPostForm
+# Form tests for actual JobPostForm
 class JobPostFormTests(TestCase):
     """Test the job creation form"""
 
@@ -286,6 +286,20 @@ class JobPostFormTests(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn("price_type", form.errors)
 
+    def test_pay_too_high(self):
+        """Test that pay over 999,999.99 is rejected"""
+        form_data = {
+            'title': 'Test Job',
+            'description': 'Test Description',
+            'location': 'Test City',
+            'price_type': 'FL',
+            'pay': 1000000.00,
+            'start_date': date.today(),
+        }
+        form = JobPostForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('pay', form.errors)
+
     def test_form_excludes_correct_fields(self):
         """Test that the form excludes the right fields"""
         form = JobPostForm()
@@ -303,6 +317,70 @@ class JobPostFormTests(TestCase):
         self.assertEqual(form.fields["end_date"].widget.__class__.__name__, "DateInput")
         self.assertIn('type="date"', str(form["start_date"]))
 
+        # ========== NEW LOCATION VALIDATION TESTS ==========
+    
+    def test_valid_location_passes_validation(self):
+        """Test that a valid geocodable address passes validation"""
+        form_data = {
+            "title": "Test Job",
+            "description": "Test Description",
+            "location": "Missoula, MT",  # Valid address
+            "price_type": "FL",
+            "pay": 50.00,
+            "start_date": date.today().isoformat(),
+        }
+        form = JobPostForm(data=form_data)
+        self.assertTrue(form.is_valid())
+    
+    def test_invalid_location_fails_validation(self):
+        """Test that an invalid geocodable address fails validation"""
+        # Temporarily patch _geocode to raise ValueError for this test only
+        with patch("location.models.Location._geocode") as mock_geocode:
+            mock_geocode.side_effect = ValueError("Could not geocode: invalid")
+            
+            form_data = {
+                "title": "Test Job",
+                "description": "Test Description",
+                "location": "invalid address that fails",
+                "price_type": "FL",
+                "pay": 50.00,
+                "start_date": date.today().isoformat(),
+            }
+            form = JobPostForm(data=form_data)
+            self.assertFalse(form.is_valid())
+            self.assertIn("location", form.errors)
+    
+    def test_empty_location_fails_validation(self):
+        """Test that empty location fails validation"""
+        form_data = {
+            "title": "Test Job",
+            "description": "Test Description",
+            "location": "",  # Empty
+            "price_type": "FL",
+            "pay": 50.00,
+            "start_date": date.today().isoformat(),
+        }
+        form = JobPostForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn("location", form.errors)
+    
+    def test_location_geocode_api_error_handled(self):
+        """Test that API errors are caught and shown to user"""
+        with patch("location.models.Location._geocode") as mock_geocode:
+            # Simulate a network/API error
+            mock_geocode.side_effect = Exception("API connection failed")
+            
+            form_data = {
+                "title": "Test Job",
+                "description": "Test Description",
+                "location": "Some Address",
+                "price_type": "FL",
+                "pay": 50.00,
+                "start_date": date.today().isoformat(),
+            }
+            form = JobPostForm(data=form_data)
+            self.assertFalse(form.is_valid())
+            self.assertIn("location", form.errors)
 
 # ADDED TESTS FOR NEGATIVE PAY VALIDATION
 class JobModelValidationTests(TestCase):
@@ -392,6 +470,42 @@ class JobModelValidationTests(TestCase):
         except ValidationError:
             self.fail("Valid job with positive pay raised validation error")
 
+    # ========== NEW LOCATION MODEL VALIDATION TESTS ==========
+    
+    def test_invalid_location_raises_validation_error_at_model_level(self):
+        """Test that invalid location raises ValidationError in model.clean()"""
+        with patch("location.models.Location._geocode") as mock_geocode:
+            mock_geocode.side_effect = ValueError("Could not geocode")
+            
+            job = JobPost(
+                poster=self.user,
+                title="Test Job",
+                description="Test Description",
+                location="invalid address",
+                price_type="FL",
+                pay=50.00,
+                start_date=date.today(),
+            )
+            
+            with self.assertRaises(ValidationError):
+                job.full_clean()
+    
+    def test_valid_location_passes_model_validation(self):
+        """Test that valid location passes model validation"""
+        job = JobPost(
+            poster=self.user,
+            title="Test Job",
+            description="Test Description",
+            location="Missoula, MT",  # Will use the global patch
+            price_type="FL",
+            pay=50.00,
+            start_date=date.today(),
+        )
+        
+        try:
+            job.full_clean()
+        except ValidationError:
+            self.fail("Valid job with good location raised validation error")
 
 # ADDED TESTS FOR DATE VALIDATION
 class JobDateValidationTests(TestCase):
@@ -596,3 +710,193 @@ class JobDateValidationTests(TestCase):
 
         form = JobPostForm(data=form_data)
         self.assertTrue(form.is_valid())
+
+# TEST CLASS FOR AI ENHANCEMENT USING LLM
+# Import Ollama's Client and rename OllamaClient
+# SO IT DOES NOT CONFLICT WITH django.test Client in jobs/test.py
+try:
+    from ollama import Client as OllamaClient
+    OLLAMA_AVAILABLE = True
+except ImportError:
+    OLLAMA_AVAILABLE = False
+
+@unittest.skipIf(not OLLAMA_AVAILABLE, "Ollama not installed")
+class AIEnhancementTests(TestCase):
+    """Tests for the AI job description enhancement feature"""
+    
+    def setUp(self):
+        """Set up test client and URL"""
+        # django client not ollama
+        self.client = Client()
+        self.enhance_url = reverse('enhance_description')
+        self.user = base_user.objects.create_user(
+            username='testuser',
+            password='testpass123',
+            email='test@example.com'
+        )
+    
+    @patch('jobs.views.ollama_client')
+    def test_enhance_endpoint_returns_success(self, mock_ollama):
+        """Test that enhance endpoint returns enhanced description"""
+        # Mock Ollama response
+        mock_response = {
+            'message': {
+                'content': 'This is an enhanced professional job description.'
+            }
+        }
+        mock_ollama.chat.return_value = mock_response
+        
+        # Make request
+        response = self.client.post(
+            self.enhance_url,
+            data=json.dumps({'description': 'basic job description'}),
+            content_type='application/json'
+        )
+        
+        # Assertions
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data['success'])
+        self.assertIn('enhanced_description', data)
+        self.assertEqual(data['enhanced_description'], 'This is an enhanced professional job description.')
+    
+    def test_enhance_endpoint_handles_empty_description(self):
+        """Test that empty description returns error"""
+        response = self.client.post(
+            self.enhance_url,
+            data=json.dumps({'description': ''}),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertIn('error', data)
+    
+    def test_enhance_endpoint_handles_missing_description(self):
+        """Test that missing description field returns error"""
+        response = self.client.post(
+            self.enhance_url,
+            data=json.dumps({}),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertIn('error', data)
+    
+    @patch('jobs.views.ollama_client')
+    def test_enhance_endpoint_handles_ollama_exception(self, mock_ollama):
+        """Test that Ollama exception is handled gracefully"""
+        # Mock an exception
+        mock_ollama.chat.side_effect = Exception("Ollama connection error")
+        
+        response = self.client.post(
+            self.enhance_url,
+            data=json.dumps({'description': 'test description'}),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 500)
+        data = response.json()
+        self.assertIn('error', data)
+    
+    @patch('jobs.views.ollama_client')
+    def test_enhance_endpoint_handles_very_long_description(self, mock_ollama):
+        """Test that very long descriptions are handled"""
+        # Mock successful Ollama response
+        mock_response = {
+            'message': {
+                'content': 'Enhanced long description'
+            }
+        }
+        mock_ollama.chat.return_value = mock_response
+        
+        # Create a very long description (2000 characters)
+        long_description = "a " * 1000
+        
+        response = self.client.post(
+            self.enhance_url,
+            data=json.dumps({'description': long_description}),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data['success'])
+    
+    def test_enhance_endpoint_requires_post_method(self):
+        """Test that GET requests are not allowed"""
+        response = self.client.get(self.enhance_url)
+        self.assertEqual(response.status_code, 405)  # Method not allowed
+    
+    def test_enhance_endpoint_handles_malformed_json(self):
+        """Test that malformed JSON returns error"""
+        response = self.client.post(
+            self.enhance_url,
+            data='not valid json',
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 500)
+        data = response.json()
+        self.assertIn('error', data)
+    
+    @patch('jobs.views.ollama_client')
+    def test_enhance_endpoint_passes_correct_parameters(self, mock_ollama):
+        """Test that the correct parameters are passed to Ollama"""
+        mock_response = {
+            'message': {
+                'content': 'Enhanced text'
+            }
+        }
+        mock_ollama.chat.return_value = mock_response
+        
+        original_description = "Need a plumber for leaky faucet"
+        
+        response = self.client.post(
+            self.enhance_url,
+            data=json.dumps({'description': original_description}),
+            content_type='application/json'
+        )
+
+        # Verify HTTP response is correct
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data['success'])
+        self.assertEqual(data['enhanced_description'], 'Enhanced text')
+        
+        # Verify Ollama was called once
+        self.assertEqual(mock_ollama.chat.call_count, 1)
+        
+        # Get the arguments passed to ollama_client.chat
+        call_args = mock_ollama.chat.call_args[1]
+        
+        # Verify the correct model was used
+        self.assertEqual(call_args.get('model'), 'llama3.2:1b')
+        
+        # Verify the prompt contains the original description
+        messages = call_args.get('messages', [])
+        self.assertTrue(len(messages) > 0)
+        self.assertIn(original_description, messages[0].get('content', ''))
+    
+    @patch('jobs.views.ollama_client')
+    def test_enhance_endpoint_strips_prompt_artifacts(self, mock_ollama):
+        """Test that the endpoint removes 'Improved description:' prefix if present"""
+        # Mock response that includes the prefix
+        mock_response = {
+            'message': {
+                'content': 'Improved description: This is the actual enhanced text.'
+            }
+        }
+        mock_ollama.chat.return_value = mock_response
+        
+        response = self.client.post(
+            self.enhance_url,
+            data=json.dumps({'description': 'test description'}),
+            content_type='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        # The prefix should be stripped
+        self.assertEqual(data['enhanced_description'], 'This is the actual enhanced text.')

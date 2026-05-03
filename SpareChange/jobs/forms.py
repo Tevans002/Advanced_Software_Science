@@ -39,6 +39,10 @@ class JobPostForm(forms.ModelForm):
         pay = self.cleaned_data.get("pay")
         price_type = self.cleaned_data.get("price_type")
 
+        # Check if pay is too high
+        if pay and pay > 999999.99:
+            raise ValidationError("Pay amount is too high. Please enter valid amount.")
+
         # If price_type isn't set yet, skip validation for now
         if price_type is None:
             return pay
@@ -54,17 +58,13 @@ class JobPostForm(forms.ModelForm):
         if price_type in ["FL", "HR"]:
             if pay is None:
                 raise ValidationError(
-                    "Pay amount is required for Flate Rate and Hourly jobs."
+                    "Pay amount is required for Flat Rate and Hourly jobs."
                 )
 
             if pay <= 0:
                 raise ValidationError("Pay amount must be greater than zero.")
 
             return pay
-
-        # Check if pay is too high
-        if pay and pay > 999999.99:
-            raise ValidationError("Pay amount is too high. Please enter valid amount.")
 
         return pay
 
@@ -101,7 +101,7 @@ class JobPostForm(forms.ModelForm):
             raise ValidationError("Please enter a valid address.")
         try:
             Location._geocode(address)
-        except ValueError:
+        except (ValueError, Exception) as e:
             raise ValidationError(
                 "We could not find that address. Please enter a valid address."
             )

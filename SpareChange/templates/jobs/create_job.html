@@ -29,7 +29,17 @@
     <!-- Description Field -->
     <div class="field-wrap">
       <label for="{{ form.description.id_for_label }}">Description:</label>
-      {{ form.description }} {% if form.description.errors %}
+      {{ form.description }}
+      
+      <!-- Enhancement button-->
+      <button type="button" id="enhanceDescriptionBtn" class="btn" style="margin-top: 8px; width: auto;">
+        ✨ Enhance with AI
+      </button>
+      <small class="field-help">
+        Write a basic description, then click enhance to improve it with AI.
+      </small>
+      
+      {% if form.description.errors %}
       <div class="field-errors">
         {% for error in form.description.errors %}
         <p>{{ error }}</p>
@@ -129,4 +139,79 @@
     <button type="submit" class="btn">Post Job</button>
   </form>
 </div>
+
+<!--HERE IS THE JAVASCRIPT TO HANDLE THE AI ENHANCEMENT BUTTON FOR JOB DESCRIPTION-->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const enhanceBtn = document.getElementById('enhanceDescriptionBtn');
+    const descriptionField = document.getElementById('{{ form.description.id_for_label }}');
+    const originalDescription = descriptionField.value;
+    
+    enhanceBtn.addEventListener('click', async function() {
+        const currentDescription = descriptionField.value;
+        
+        // Don't enhance empty descriptions
+        if (!currentDescription.trim()) {
+            alert('Please write a basic description first before enhancing.');
+            return;
+        }
+        
+        // Disable button and show loading state
+        enhanceBtn.disabled = true;
+        enhanceBtn.textContent = '⏳ Enhancing...';
+        
+        try {
+            const response = await fetch('{% url "enhance_description" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    description: currentDescription
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Save original text in case user wants to revert
+                descriptionField.dataset.original = currentDescription;
+                
+                // Update the textarea with enhanced version
+                descriptionField.value = data.enhanced_description;
+                
+                // Optional: Add a "revert" button
+                if (!document.getElementById('revertDescriptionBtn')) {
+                    const revertBtn = document.createElement('button');
+                    revertBtn.id = 'revertDescriptionBtn';
+                    revertBtn.textContent = '↩️ Revert to original';
+                    revertBtn.className = 'btn';
+                    revertBtn.style.marginTop = '8px';
+                    revertBtn.style.marginLeft = '8px';
+                    revertBtn.style.width = 'auto';
+                    
+                    revertBtn.addEventListener('click', function() {
+                        if (descriptionField.dataset.original) {
+                            descriptionField.value = descriptionField.dataset.original;
+                            revertBtn.remove();
+                        }
+                    });
+                    
+                    enhanceBtn.parentNode.appendChild(revertBtn);
+                }
+            } else {
+                alert('Error: ' + (data.error || 'Failed to enhance description'));
+            }
+        } catch (error) {
+            alert('Network error: Could not reach AI service. Is Ollama running?');
+            console.error('Error:', error);
+        } finally {
+            // Re-enable button
+            enhanceBtn.disabled = false;
+            enhanceBtn.textContent = '✨ Enhance with AI';
+        }
+    });
+});
+</script>
 {% endblock %}
